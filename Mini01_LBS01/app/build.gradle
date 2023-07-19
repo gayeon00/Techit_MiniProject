@@ -4,6 +4,9 @@ plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
 android {
     namespace 'com.test.mini01_lbs01'
     compileSdk 33
@@ -18,7 +21,15 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
+        debug {
+            buildConfigField("String", "MAPS_API_KEY", "" + localProperties['MAPS_API_KEY'] + "")
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -50,4 +61,5 @@ dependencies {
     implementation "androidx.core:core-splashscreen:1.0.1"
     implementation "com.google.android.gms:play-services-maps:18.1.0"
     implementation "com.google.android.gms:play-services-location:21.0.1"
+    implementation "com.google.android.libraries.places:places:3.2.0"
 }
