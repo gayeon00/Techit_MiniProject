@@ -10,7 +10,7 @@
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
 
-        <item name="windowSplashScreenAnimatedIcon">@drawable/baseline_map_24</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher2</item>
 
         <!-- splash화면 이후 나올 theme -->
         <item name="postSplashScreenTheme">@style/Theme.Mini01_LBS01</item>
