@@ -114,9 +114,9 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
 //                            map?.addMarker(MarkerOptions()
 //                                .title("Marker")
 //                                .position(latLng)
-//                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.placeholder)))
+//                                .icon(BitmapDescriptorFactory.fromResource(android.R.drawable.ic_menu_mylocation)))
                             //카메라 이동
-                            map?.moveCamera(
+                            map?.animateCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     latLng, DEFAULT_ZOOM.toFloat()
                                 )
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
                         Log.e(TAG, "Exception: %s", task.exception)
-                        map?.moveCamera(
+                        map?.animateCamera(
                             CameraUpdateFactory.newLatLngZoom(
                                     defaultLocation,
                                     DEFAULT_ZOOM.toFloat()
