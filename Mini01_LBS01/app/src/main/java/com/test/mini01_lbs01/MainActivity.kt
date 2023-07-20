@@ -1,25 +1,25 @@
 package com.test.mini01_lbs01
 
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -79,14 +79,12 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
         "rv_park", "school", "secondary_school", "shoe_store", "shopping_mall",
         "spa", "stadium", "storage", "store", "subway_station", "supermarket",
         "synagogue", "taxi_stand", "tourist_attraction", "train_station",
-        "transit_station", "travel_agency", "university", "eterinary_care","zoo"
+        "transit_station", "travel_agency", "university", "eterinary_care", "zoo"
     )
 
     private val placesURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
     private var location = ""
     private var radius = 50000
-    private var type = dialogData[0]
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,8 +134,35 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            dialogData
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle("장소 종류 선택")
+            .setAdapter(adapter) { dialogInterface: DialogInterface, i: Int ->
+                showNearByPlaces(dialogData[i])
+            }
+            .setNegativeButton("취소", null)
+            .setNeutralButton("초기화") { dialogInterface: DialogInterface, i: Int ->
+                clearMarker()
+            }
+            .show()
+
+
+        return false
+    }
+
+    private fun showNearByPlaces(type: String) {
         thread {
-            val url = URL("$placesURL?location=$location&radius=$radius&type=$type&key=${BuildConfig.PLACES_API_KEY}")
+            runOnUiThread {
+                //원래 있던 마커 모두 삭제
+                clearMarker()
+            }
+            val url =
+                URL("$placesURL?location=$location&radius=$radius&type=$type&key=${BuildConfig.PLACES_API_KEY}")
 
             //접속 후 스트림 추출
             val httpURLConnection = url.openConnection() as HttpURLConnection
@@ -162,7 +187,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
             val root = JSONObject(data)
             val result = root.getJSONArray("results")
 
-            for(idx in 0 until result.length()) {
+            for (idx in 0 until result.length()) {
                 val venue = result.getJSONObject(idx)
                 val latlng = getLatLng(venue)
                 val name = venue.getString("name")
@@ -176,11 +201,12 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
                             .snippet(vicinity)
                     )
                 }
-
-                val types = venue.getJSONArray("types")
             }
         }
-        return false
+    }
+
+    private fun clearMarker() {
+        map?.clear()
     }
 
     private fun getLatLng(venue: JSONObject): LatLng {
@@ -225,16 +251,17 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
                                 )
                             )
 
-                            this.location = "${lastKnownLocation!!.latitude}%2c${lastKnownLocation!!.longitude}"
+                            this.location =
+                                "${lastKnownLocation!!.latitude}%2c${lastKnownLocation!!.longitude}"
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
                         Log.e(TAG, "Exception: %s", task.exception)
                         map?.animateCamera(
                             CameraUpdateFactory.newLatLngZoom(
-                                    defaultLocation,
-                                    DEFAULT_ZOOM.toFloat()
-                                )
+                                defaultLocation,
+                                DEFAULT_ZOOM.toFloat()
+                            )
                         )
                         map?.uiSettings?.isMyLocationButtonEnabled = false
                     }
