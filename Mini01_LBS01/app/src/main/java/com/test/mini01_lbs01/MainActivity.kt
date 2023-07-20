@@ -4,11 +4,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,6 +28,12 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.test.mini01_lbs01.PermissionUtils.PermissionDeniedDialog.Companion.newInstance
 import com.test.mini01_lbs01.PermissionUtils.isPermissionGranted
 import com.test.mini01_lbs01.databinding.ActivityMainBinding
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
     GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
@@ -47,6 +56,39 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
+
+    private val dialogData = arrayOf(
+        "accounting", "airport", "amusement_park",
+        "aquarium", "art_gallery", "atm", "bakery",
+        "bank", "bar", "beauty_salon", "bicycle_store",
+        "book_store", "bowling_alley", "bus_station",
+        "cafe", "campground", "car_dealer", "car_rental",
+        "car_repair", "car_wash", "casino", "cemetery",
+        "church", "city_hall", "clothing_store", "convenience_store",
+        "courthouse", "dentist", "department_store", "doctor",
+        "drugstore", "electrician", "electronics_store", "embassy",
+        "fire_station", "florist", "funeral_home", "furniture_store",
+        "gas_station", "gym", "hair_care", "hardware_store", "hindu_temple",
+        "home_goods_store", "hospital", "insurance_agency",
+        "jewelry_store", "laundry", "lawyer", "library", "light_rail_station",
+        "liquor_store", "local_government_office", "locksmith", "lodging",
+        "meal_delivery", "meal_takeaway", "mosque", "movie_rental", "movie_theater",
+        "moving_company", "museum", "night_club", "painter", "park", "parking",
+        "pet_store", "pharmacy", "physiotherapist", "plumber", "police", "post_office",
+        "primary_school", "real_estate_agency", "restaurant", "roofing_contractor",
+        "rv_park", "school", "secondary_school", "shoe_store", "shopping_mall",
+        "spa", "stadium", "storage", "store", "subway_station", "supermarket",
+        "synagogue", "taxi_stand", "tourist_attraction", "train_station",
+        "transit_station", "travel_agency", "university", "eterinary_care","zoo"
+    )
+
+    private val placesURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    private var location = ""
+    private var radius = 50000
+    private var type = dialogData[0]
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -88,6 +130,67 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        thread {
+            val url = URL("$placesURL?location=$location&radius=$radius&type=$type&key=${BuildConfig.PLACES_API_KEY}")
+
+            //접속 후 스트림 추출
+            val httpURLConnection = url.openConnection() as HttpURLConnection
+
+            val inputStreamReader =
+                InputStreamReader(httpURLConnection.inputStream, "UTF-8")
+            //라인 단위로 한번에 많이 읽어오기 위해서 사용!
+            val bufferedReader = BufferedReader(inputStreamReader)
+
+            var str: String? = null
+            val stringBuffer = StringBuffer()
+            //문서의 마지막까지 읽어오기
+            do {
+                str = bufferedReader.readLine()
+                if (str != null) {
+                    stringBuffer.append(str)
+                }
+            } while (str != null)
+
+            val data = stringBuffer.toString()
+
+            val root = JSONObject(data)
+            val result = root.getJSONArray("results")
+
+            for(idx in 0 until result.length()) {
+                val venue = result.getJSONObject(idx)
+                val latlng = getLatLng(venue)
+                val name = venue.getString("name")
+                val vicinity = venue.getString("vicinity")
+
+                runOnUiThread {
+                    map?.addMarker(
+                        MarkerOptions()
+                            .position(latlng)
+                            .title(name)
+                            .snippet(vicinity)
+                    )
+                }
+
+                val types = venue.getJSONArray("types")
+            }
+        }
+        return false
+    }
+
+    private fun getLatLng(venue: JSONObject): LatLng {
+        val location = venue.getJSONObject("geometry").getJSONObject("location")
+        val lat = location.getDouble("lat")
+        val lng = location.getDouble("lng")
+
+        return LatLng(lat, lng)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         map?.let { map ->
             outState.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
@@ -121,6 +224,8 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
                                     latLng, DEFAULT_ZOOM.toFloat()
                                 )
                             )
+
+                            this.location = "${lastKnownLocation!!.latitude}%2c${lastKnownLocation!!.longitude}"
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.")
@@ -188,6 +293,7 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
 
     override fun onMyLocationClick(location: Location) {
         Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG).show()
+        this.location = "${location.latitude}%2c${location.longitude}"
     }
 
     override fun onRequestPermissionsResult(

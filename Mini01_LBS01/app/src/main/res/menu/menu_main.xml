@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nearby"
+        android:icon="@android:drawable/ic_dialog_map"
+        android:title="주변 정보"
+        app:iconTint="@color/material_dynamic_neutral50"
+        app:showAsAction="always" />
+</menu>
