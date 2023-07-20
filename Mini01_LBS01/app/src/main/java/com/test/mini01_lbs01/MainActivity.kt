@@ -161,47 +161,64 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback,
                 //원래 있던 마커 모두 삭제
                 clearMarker()
             }
-            val url =
-                URL("$placesURL?location=$location&radius=$radius&type=$type&key=${BuildConfig.PLACES_API_KEY}")
+            //다음 페이지의 토큰을 담을 변수
+            var nextToken: String? = null
 
-            //접속 후 스트림 추출
-            val httpURLConnection = url.openConnection() as HttpURLConnection
-
-            val inputStreamReader =
-                InputStreamReader(httpURLConnection.inputStream, "UTF-8")
-            //라인 단위로 한번에 많이 읽어오기 위해서 사용!
-            val bufferedReader = BufferedReader(inputStreamReader)
-
-            var str: String? = null
-            val stringBuffer = StringBuffer()
-            //문서의 마지막까지 읽어오기
             do {
-                str = bufferedReader.readLine()
-                if (str != null) {
-                    stringBuffer.append(str)
+                //만약 nextToken이 null이 아니면 주소 뒤에 붙여줌
+                val url = if(nextToken!=null) {
+                    URL("$placesURL?pagetoken=$nextToken")
+                } else {
+                    URL("$placesURL?location=$location&radius=$radius&type=$type&key=${BuildConfig.PLACES_API_KEY}")
                 }
-            } while (str != null)
 
-            val data = stringBuffer.toString()
+                //접속 후 스트림 추출
+                val httpURLConnection = url.openConnection() as HttpURLConnection
 
-            val root = JSONObject(data)
-            val result = root.getJSONArray("results")
+                val inputStreamReader =
+                    InputStreamReader(httpURLConnection.inputStream, "UTF-8")
+                //라인 단위로 한번에 많이 읽어오기 위해서 사용!
+                val bufferedReader = BufferedReader(inputStreamReader)
 
-            for (idx in 0 until result.length()) {
-                val venue = result.getJSONObject(idx)
-                val latlng = getLatLng(venue)
-                val name = venue.getString("name")
-                val vicinity = venue.getString("vicinity")
+                var str: String? = null
+                val stringBuffer = StringBuffer()
+                //문서의 마지막까지 읽어오기
+                do {
+                    str = bufferedReader.readLine()
+                    if (str != null) {
+                        stringBuffer.append(str)
+                    }
+                } while (str != null)
 
-                runOnUiThread {
-                    map?.addMarker(
-                        MarkerOptions()
-                            .position(latlng)
-                            .title(name)
-                            .snippet(vicinity)
-                    )
+                val data = stringBuffer.toString()
+
+                val root = JSONObject(data)
+                val result = root.getJSONArray("results")
+
+                for (idx in 0 until result.length()) {
+                    val venue = result.getJSONObject(idx)
+                    val latlng = getLatLng(venue)
+                    val name = venue.getString("name")
+                    val vicinity = venue.getString("vicinity")
+
+                    runOnUiThread {
+                        map?.addMarker(
+                            MarkerOptions()
+                                .position(latlng)
+                                .title(name)
+                                .snippet(vicinity)
+                        )
+                    }
                 }
-            }
+
+                //nextToken 값이 있다면
+                nextToken = if (root.has("next_page_token")) {
+                    root.getString("next_page_token")
+                } else {
+                    null
+                }
+
+            } while (nextToken != null)
         }
     }
 
