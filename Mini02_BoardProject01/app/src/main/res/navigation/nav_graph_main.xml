@@ -9,36 +9,32 @@
         android:id="@+id/logInFragment"
         android:name="com.test.mini02_boardproject01.fragment.LogInFragment"
         android:label="fragment_log_in"
-        tools:layout="@layout/fragment_log_in" >
+        tools:layout="@layout/fragment_log_in">
         <action
             android:id="@+id/action_logInFragment_to_joinFragment"
-            app:destination="@id/joinFragment" />
-        <action
-            android:id="@+id/action_logInFragment_to_boardMainFragment"
-            app:destination="@id/boardMainFragment" />
+            app:destination="@id/joinFragment"
+            app:enterAnim="@anim/enter_anim"
+            app:exitAnim="@anim/exit_anim"
+            app:popEnterAnim="@anim/pop_enter_anim"
+            app:popExitAnim="@anim/pop_exit_anim" />
 
     </fragment>
     <fragment
         android:id="@+id/joinFragment"
         android:name="com.test.mini02_boardproject01.fragment.JoinFragment"
         android:label="fragment_join"
-        tools:layout="@layout/fragment_join" >
+        tools:layout="@layout/fragment_join">
         <action
             android:id="@+id/action_joinFragment_to_addUserInfoFragment"
-            app:destination="@id/addUserInfoFragment" />
+            app:destination="@id/addUserInfoFragment"
+            app:enterAnim="@anim/enter_anim"
+            app:exitAnim="@anim/exit_anim"
+            app:popEnterAnim="@anim/pop_enter_anim"
+            app:popExitAnim="@anim/pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/addUserInfoFragment"
         android:name="com.test.mini02_boardproject01.fragment.AddUserInfoFragment"
         android:label="fragment_add_user_info"
-        tools:layout="@layout/fragment_add_user_info" >
-        <action
-            android:id="@+id/action_addUserInfoFragment_to_boardMainFragment"
-            app:destination="@id/boardMainFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/boardMainFragment"
-        android:name="com.test.mini02_boardproject01.fragment.BoardMainFragment"
-        android:label="fragment_board_main"
-        tools:layout="@layout/fragment_board_main" />
+        tools:layout="@layout/fragment_add_user_info"/>
 </navigation>

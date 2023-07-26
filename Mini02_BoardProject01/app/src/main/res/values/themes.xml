@@ -1,5 +1,5 @@
-
 <resources>
+
     <style name="Theme.Mini02_BoardProject01" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
@@ -36,5 +36,10 @@
 
         <!-- splash화면 이후 나올 theme -->
         <item name="postSplashScreenTheme">@style/Theme.Mini02_BoardProject01</item>
+    </style>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Mini02_BoardProject01" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 </resources>

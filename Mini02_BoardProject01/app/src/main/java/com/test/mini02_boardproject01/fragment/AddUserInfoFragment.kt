@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.R
+import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.FragmentAddUserInfoBinding
 
 class AddUserInfoFragment : Fragment() {
@@ -49,16 +50,10 @@ class AddUserInfoFragment : Fragment() {
 
                 mainActivity.savePreference()
 
-                val navController = findNavController()
-                navController.popBackStack()
-                navController.navigate(R.id.boardMainFragment, null, navOptions {
-                    anim {
-                        enter = R.anim.enter_anim
-                        exit = R.anim.exit_anim
-                        popEnter = R.anim.pop_enter_anim
-                        popExit = R.anim.pop_exit_anim
-                    }
-                })
+                val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
+                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(newIntent)
+                mainActivity.finish()
             }
 
             checkBox.setOnCheckedChangeListener { compoundButton, b ->

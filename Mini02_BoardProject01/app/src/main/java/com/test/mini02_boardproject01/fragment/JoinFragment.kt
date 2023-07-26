@@ -31,14 +31,7 @@ class JoinFragment : Fragment() {
                     mainActivity.userId = userId
                     mainActivity.userPw = userPw
 
-                    findNavController().navigate(R.id.addUserInfoFragment, null, navOptions {
-                        anim {
-                            enter = R.anim.enter_anim
-                            exit = R.anim.exit_anim
-                            popEnter = R.anim.pop_enter_anim
-                            popExit = R.anim.pop_exit_anim
-                        }
-                    })
+                    findNavController().navigate(R.id.addUserInfoFragment)
                 } else {
                     textInputLayoutJoinUserPwRe.error = "비밀번호가 일치하지 않습니다."
                 }
