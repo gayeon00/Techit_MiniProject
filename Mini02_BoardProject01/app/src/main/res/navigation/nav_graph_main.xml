@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/nav_graph_main"
     app:startDestination="@id/logInFragment">
 
     <fragment
@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_logInFragment_to_joinFragment"
             app:destination="@id/joinFragment" />
+        <action
+            android:id="@+id/action_logInFragment_to_boardMainFragment"
+            app:destination="@id/boardMainFragment" />
 
     </fragment>
     <fragment
@@ -28,5 +31,14 @@
         android:id="@+id/addUserInfoFragment"
         android:name="com.test.mini02_boardproject01.fragment.AddUserInfoFragment"
         android:label="fragment_add_user_info"
-        tools:layout="@layout/fragment_add_user_info" />
+        tools:layout="@layout/fragment_add_user_info" >
+        <action
+            android:id="@+id/action_addUserInfoFragment_to_boardMainFragment"
+            app:destination="@id/boardMainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/boardMainFragment"
+        android:name="com.test.mini02_boardproject01.fragment.BoardMainFragment"
+        android:label="fragment_board_main"
+        tools:layout="@layout/fragment_board_main" />
 </navigation>

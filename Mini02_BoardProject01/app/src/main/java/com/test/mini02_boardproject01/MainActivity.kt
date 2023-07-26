@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -19,6 +20,13 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var activityMainBinding: ActivityMainBinding
     lateinit var navController: NavController
+    var preferences: SharedPreferences? = null
+
+    var userId = ""
+    var userPw = ""
+    var userNickname = ""
+    var userAge = ""
+    var userJoinRoute = mutableSetOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +37,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
 
         navController = findNavController(R.id.nav_host_fragment)
+        preferences = getSharedPreferences("data", MODE_PRIVATE)
+
+        if(preferences!=null) {
+            userId = preferences!!.getString("userId","user").toString()
+            userPw = preferences!!.getString("userPw","user").toString()
+            userNickname = preferences!!.getString("userNickname","user").toString()
+            userAge = preferences!!.getString("userAge","user").toString()
+            userJoinRoute = preferences!!.getStringSet("userJoinRoute",
+                mutableSetOf<String>()) as MutableSet<String>
+        }
     }
 
     //splash screen 커스터마이징
@@ -72,5 +90,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    fun savePreference() {
+        val editor = preferences!!.edit()
+        editor.putString("userId", userId)
+        editor.putString("userPw", userPw)
+        editor.putString("userNickname", userNickname)
+        editor.putString("userAge", userAge)
+        editor.putStringSet("userJoinRoute", userJoinRoute.toSet())
+
+        editor.apply()
     }
 }
