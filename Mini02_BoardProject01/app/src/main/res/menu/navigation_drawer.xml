@@ -40,7 +40,8 @@
     </item>
 
     <item
-        android:id="@+id/item_board_main_user_info"
+        android:id="@+id/item_user_info"
+        android:checkable="true"
         android:icon="@drawable/account_box_24px"
         android:title="사용자 정보 수정"
         app:showAsAction="ifRoom" />

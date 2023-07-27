@@ -3,31 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_board"
-    app:startDestination="@id/whole_item">
+    app:startDestination="@id/postListFragment">
+
 
     <fragment
-        android:id="@+id/whole_item"
-        android:name="com.test.mini02_boardproject01.board.WholeBoardFragment"
-        android:label="fragment_whole_board"
-        tools:layout="@layout/fragment_whole_board" />
+        android:id="@+id/item_board_main_user_info"
+        android:name="com.test.mini02_boardproject01.board.ModifyUserFragment"
+        android:label="fragment_modify_user"
+        tools:layout="@layout/fragment_modify_user" />
+    <activity
+        android:id="@+id/item_board_main_logout"
+        android:name="com.test.mini02_boardproject01.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
+    <activity
+        android:id="@+id/item_board_main_sign_out"
+        android:name="com.test.mini02_boardproject01.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
     <fragment
-        android:id="@+id/free_item"
-        android:name="com.test.mini02_boardproject01.board.FreeBoardFragment"
-        android:label="fragment_free_board"
-        tools:layout="@layout/fragment_free_board" />
-    <fragment
-        android:id="@+id/humor_item"
-        android:name="com.test.mini02_boardproject01.board.HumorBoardFragment"
-        android:label="fragment_humor_board"
-        tools:layout="@layout/fragment_humor_board" />
-    <fragment
-        android:id="@+id/sports_item"
-        android:name="com.test.mini02_boardproject01.board.SportsBoardFragment"
-        android:label="fragment_sports_board"
-        tools:layout="@layout/fragment_sports_board" />
-    <fragment
-        android:id="@+id/qna_item"
-        android:name="com.test.mini02_boardproject01.board.QnaBoardFragment"
-        android:label="fragment_qna_board"
-        tools:layout="@layout/fragment_qna_board" />
+        android:id="@+id/postListFragment"
+        android:name="com.test.mini02_boardproject01.board.PostListFragment"
+        android:label="fragment_post_list"
+        tools:layout="@layout/fragment_post_list" />
 </navigation>
