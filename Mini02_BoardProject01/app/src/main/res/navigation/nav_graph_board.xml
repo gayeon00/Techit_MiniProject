@@ -25,5 +25,26 @@
         android:id="@+id/postListFragment"
         android:name="com.test.mini02_boardproject01.board.PostListFragment"
         android:label="fragment_post_list"
-        tools:layout="@layout/fragment_post_list" />
+        tools:layout="@layout/fragment_post_list" >
+        <action
+            android:id="@+id/action_postListFragment_to_postWriteFragment"
+            app:destination="@id/postWriteFragment"
+            app:enterAnim="@anim/enter_anim"
+            app:exitAnim="@anim/exit_anim"
+            app:popEnterAnim="@anim/pop_enter_anim"
+            app:popExitAnim="@anim/pop_exit_anim" />
+        <action
+            android:id="@+id/action_postListFragment_to_postReadFragment"
+            app:destination="@id/postReadFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postWriteFragment"
+        android:name="com.test.mini02_boardproject01.board.PostWriteFragment"
+        android:label="fragment_post_write"
+        tools:layout="@layout/fragment_post_write" />
+    <fragment
+        android:id="@+id/postReadFragment"
+        android:name="com.test.mini02_boardproject01.board.PostReadFragment"
+        android:label="fragment_post_read"
+        tools:layout="@layout/fragment_post_read" />
 </navigation>

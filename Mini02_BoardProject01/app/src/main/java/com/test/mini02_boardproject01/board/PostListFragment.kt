@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.LayoutParams
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostListBinding
 import com.test.mini02_boardproject01.databinding.RowPostListBinding
 
@@ -28,6 +30,17 @@ class PostListFragment : Fragment() {
                 adapter = AllRecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
             }
+
+            recyclerViewSearchList.run {
+                adapter = ResultRecyclerViewAdapter()
+                layoutManager = LinearLayoutManager(context)
+            }
+
+            searchBar.setOnMenuItemClickListener {
+            //메뉴 누르면 수행할 일
+                findNavController().navigate(R.id.action_postListFragment_to_postWriteFragment)
+                true
+            }
         }
         return fragmentPostListBinding.root
     }
@@ -39,7 +52,43 @@ class PostListFragment : Fragment() {
             val rowPostListNickName = rowPostListBinding.rowPostListNickName
 
             init {
+                rowPostListBinding.root.setOnClickListener {
+                    //글을 볼 수 있는 postreadfragment로 이동
+                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment)
+                }
+            }
+        }
 
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllViewHolder {
+            val rowPostListBinding = RowPostListBinding.inflate(layoutInflater)
+            rowPostListBinding.root.layoutParams = ViewGroup.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+            )
+            return AllViewHolder(rowPostListBinding)
+        }
+
+        override fun getItemCount(): Int {
+            return 100
+        }
+
+        override fun onBindViewHolder(holder: AllViewHolder, position: Int) {
+            holder.rowPostListSubject.text = "제목입니다: $position"
+            holder.rowPostListNickName.text = "작성자 : $position"
+        }
+    }
+
+    inner class ResultRecyclerViewAdapter : Adapter<ResultRecyclerViewAdapter.AllViewHolder>() {
+        inner class AllViewHolder(rowPostListBinding: RowPostListBinding) :
+            ViewHolder(rowPostListBinding.root) {
+            val rowPostListSubject = rowPostListBinding.rowPostListSubject
+            val rowPostListNickName = rowPostListBinding.rowPostListNickName
+
+            init {
+                rowPostListBinding.root.setOnClickListener {
+                    //글을 볼 수 있는 postreadfragment로 이동
+                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment)
+                }
             }
         }
 
