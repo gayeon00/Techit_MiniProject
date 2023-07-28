@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.LayoutParams
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostListBinding
 import com.test.mini02_boardproject01.databinding.RowPostListBinding
@@ -29,11 +30,13 @@ class PostListFragment : Fragment() {
             recyclerViewAll.run {
                 adapter = AllRecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
+                addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL))
             }
 
             recyclerViewSearchList.run {
                 adapter = ResultRecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
+                addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL))
             }
 
             searchBar.setOnMenuItemClickListener {
@@ -43,6 +46,12 @@ class PostListFragment : Fragment() {
             }
         }
         return fragmentPostListBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val boardType = arguments?.getString("boardType")
     }
 
     inner class AllRecyclerViewAdapter : Adapter<AllRecyclerViewAdapter.AllViewHolder>() {

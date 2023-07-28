@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostReadBinding
 
@@ -32,6 +33,7 @@ class PostReadFragment : Fragment() {
         //누른 거에 따라 작업 다르게 해주기
         return when (item.itemId) {
             R.id.item_edit -> {
+                findNavController().navigate(R.id.action_postReadFragment_to_postModifyFragment)
                 true
             }
 

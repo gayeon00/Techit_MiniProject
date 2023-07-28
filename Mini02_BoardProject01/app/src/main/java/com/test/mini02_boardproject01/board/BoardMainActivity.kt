@@ -3,16 +3,10 @@ package com.test.mini02_boardproject01.board
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.ActivityBoardMainBinding
@@ -45,7 +39,7 @@ class BoardMainActivity : AppCompatActivity() {
 
         activityBoardMainBinding.run {
             // toolbar
-            materialToolbar.run{
+            materialToolbar.run {
                 title = "게시판메인"
 
                 setNavigationIcon(R.drawable.menu_24px)
@@ -61,44 +55,25 @@ class BoardMainActivity : AppCompatActivity() {
 
                 // 헤더설정
                 val headerBoardMainBinding = NavHeaderBinding.inflate(layoutInflater)
-                headerBoardMainBinding.textViewHeaderTitle.text  = "홍길동님"
+                headerBoardMainBinding.textViewHeaderTitle.text = "홍길동님"
                 addHeaderView(headerBoardMainBinding.root)
 
                 setNavigationItemSelectedListener {
-                    Log.d("what", it.itemId.toString())
+
 
                     when (it.itemId) {
-                        R.id.whole_item -> {
-                            navController.navigate(R.id.postListFragment)
+                        R.id.whole_item, R.id.free_item, R.id.humor_item, R.id.sports_item, R.id.qna_item-> {
                             navController.popBackStack()
-                            drawerLayout.close()
-                        }
+                            val args = Bundle()
+                            args.putString("boardType", it.itemId.toString())
 
-                        R.id.free_item -> {
-                            navController.navigate(R.id.postListFragment)
-                            navController.popBackStack()
-                            drawerLayout.close()
-                        }
+                            navController.navigate(R.id.postListFragment, args)
 
-                        R.id.humor_item -> {
-                            navController.navigate(R.id.postListFragment)
-                            navController.popBackStack()
-                            drawerLayout.close()
-                        }
-
-                        R.id.sports_item-> {
-                            navController.navigate(R.id.postListFragment)
-                            navController.popBackStack()
-                            drawerLayout.close()
-                        }
-
-                        R.id.qna_item -> {
-                            navController.navigate(R.id.postListFragment)
-                            navController.popBackStack()
                             drawerLayout.close()
                         }
                         //사용자 정보 수정
                         R.id.item_user_info -> {
+                            navController.popBackStack()
                             navController.navigate(R.id.item_board_main_user_info)
                             drawerLayout.close()
                         }

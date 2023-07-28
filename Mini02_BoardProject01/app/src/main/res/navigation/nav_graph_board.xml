@@ -36,6 +36,9 @@
         <action
             android:id="@+id/action_postListFragment_to_postReadFragment"
             app:destination="@id/postReadFragment" />
+        <argument
+            android:name="boardType"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/postWriteFragment"
@@ -46,5 +49,14 @@
         android:id="@+id/postReadFragment"
         android:name="com.test.mini02_boardproject01.board.PostReadFragment"
         android:label="fragment_post_read"
-        tools:layout="@layout/fragment_post_read" />
+        tools:layout="@layout/fragment_post_read" >
+        <action
+            android:id="@+id/action_postReadFragment_to_postModifyFragment"
+            app:destination="@id/postModifyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postModifyFragment"
+        android:name="com.test.mini02_boardproject01.board.PostModifyFragment"
+        android:label="fragment_post_modify"
+        tools:layout="@layout/fragment_post_modify" />
 </navigation>
