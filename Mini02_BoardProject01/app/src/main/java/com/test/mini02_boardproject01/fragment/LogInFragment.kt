@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
@@ -27,30 +28,7 @@ class LogInFragment : Fragment() {
 
         fragmentLogInBinding.run {
             buttonLogin.setOnClickListener {
-                val userId = textInputEditTextLoginUserId.text.toString()
-                val userPw = textInputEditTextLoginUserPw.text.toString()
-
-                val pref = mainActivity.getSharedPreferences("data", Context.MODE_PRIVATE)
-                val savedUserId = pref.getString("userId", "user")
-                val savedUserPw = pref.getString("userPw", "user")
-
-                if (userId == savedUserId && userPw == savedUserPw) {
-                    textInputLayoutLoginUserId.error = null
-                    textInputLayoutLoginUserPw.error = null
-
-                    val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
-                    newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(newIntent)
-                    mainActivity.finish()
-                }
-                if (userId != savedUserId) {
-                    textInputLayoutLoginUserId.error = "회원정보가 존재하지 않습니다."
-                    textInputLayoutLoginUserPw.error = null
-                }
-                if (userId == savedUserId && userPw != savedUserPw) {
-                    textInputLayoutLoginUserId.error = null
-                    textInputLayoutLoginUserPw.error = "비밀번호가 일치하지 않습니다."
-                }
+                validateLoginFields()
 
             }
             buttonGoToJoin.setOnClickListener {
@@ -59,5 +37,34 @@ class LogInFragment : Fragment() {
         }
         // Inflate the layout for this fragment
         return fragmentLogInBinding.root
+    }
+
+    private fun FragmentLogInBinding.validateLoginFields() {
+        val userId = textInputEditTextLoginUserId.text.toString()
+        val userPw = textInputEditTextLoginUserPw.text.toString()
+
+        val pref = mainActivity.getSharedPreferences("data", Context.MODE_PRIVATE)
+        val savedUserId = pref.getString("userId", "user")
+        val savedUserPw = pref.getString("userPw", "user")
+
+        if (userId.isEmpty()) {
+            textInputLayoutLoginUserId.error = "아이디를 입력해주세요."
+            return
+        }
+
+        if (userPw.isEmpty()) {
+            textInputLayoutLoginUserPw.error = "비밀번호를 입력해주세요."
+            return
+        }
+
+        if (userId != savedUserId || userPw != savedUserPw) {
+            Toast.makeText(requireContext(), "아이디나 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(newIntent)
+        mainActivity.finish()
     }
 }

@@ -59,8 +59,6 @@ class BoardMainActivity : AppCompatActivity() {
                 addHeaderView(headerBoardMainBinding.root)
 
                 setNavigationItemSelectedListener {
-
-
                     when (it.itemId) {
                         R.id.whole_item, R.id.free_item, R.id.humor_item, R.id.sports_item, R.id.qna_item-> {
                             navController.popBackStack()
