@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostWriteBinding
 
@@ -44,6 +45,7 @@ class PostWriteFragment : Fragment() {
             }
 
             R.id.item_complete -> {
+                findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
                 true
             }
 

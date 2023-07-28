@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_modify_camera"
+        android:icon="@drawable/photo_camera_24px"
+        android:title="사진촬영"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/item_modify_gallery"
+        android:icon="@drawable/photo_library_24px"
+        android:title="갤러리"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/item_modify_complete"
+        android:icon="@drawable/done_all_24px"
+        android:title="작성완료"
+        app:showAsAction="ifRoom" />
+</menu>

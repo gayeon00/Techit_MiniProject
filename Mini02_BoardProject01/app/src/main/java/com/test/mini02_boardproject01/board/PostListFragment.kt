@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +26,10 @@ class PostListFragment : Fragment() {
         fragmentPostListBinding = FragmentPostListBinding.inflate(layoutInflater)
         boardMainActivity = activity as BoardMainActivity
         // Inflate the layout for this fragment
+
+        // show the ActionBar
+        val actionBar = (activity as AppCompatActivity).supportActionBar
+        actionBar?.show()
 
         fragmentPostListBinding.run {
             recyclerViewAll.run {
