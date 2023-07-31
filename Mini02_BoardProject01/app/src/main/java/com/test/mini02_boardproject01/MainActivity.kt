@@ -4,11 +4,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.appcompat.app.AppCompatActivity
@@ -16,10 +14,8 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -33,10 +29,10 @@ class MainActivity : AppCompatActivity() {
     var userNickname = ""
     var userAge = 0L
     var userJoinRoute1 = false
-    var userJoinRoute2= false
-    var userJoinRoute3= false
-    var userJoinRoute4= false
-    var userJoinRoute5= false
+    var userJoinRoute2 = false
+    var userJoinRoute3 = false
+    var userJoinRoute4 = false
+    var userJoinRoute5 = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,10 +102,36 @@ class MainActivity : AppCompatActivity() {
 
     fun saveUserInfo() {
         val database = Firebase.database
-        val myRef = database.reference
+        val userIdxRef = database.reference.child("userIdx")
 
-        val user = User(userId, userPw, userNickname, userAge, userJoinRoute1, userJoinRoute2, userJoinRoute3, userJoinRoute4, userJoinRoute5)
-        myRef.child("users").child(userId).setValue(user)
+        var userIdx = 0L
+
+        userIdxRef.get().addOnCompleteListener {
+            for (a1 in it.result.children) {
+                userIdx = a1.value as Long
+            }
+        }
+
+        val usersRef = database.reference.child("users")
+        val user = User(
+            ++userIdx,
+            userId,
+            userPw,
+            userNickname,
+            userAge,
+            userJoinRoute1,
+            userJoinRoute2,
+            userJoinRoute3,
+            userJoinRoute4,
+            userJoinRoute5
+        )
+        usersRef.child(userId).setValue(user).addOnCompleteListener {
+            database.reference.child("userIdx").get().addOnCompleteListener {
+                for (a1 in it.result.children) {
+                    a1.ref.setValue(userIdx)
+                }
+            }
+        }
     }
 
 //    fun loadUserInfo(userId: String) {

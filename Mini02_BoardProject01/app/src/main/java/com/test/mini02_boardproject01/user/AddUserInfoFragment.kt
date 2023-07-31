@@ -10,6 +10,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.FragmentAddUserInfoBinding
@@ -100,6 +102,8 @@ class AddUserInfoFragment : Fragment() {
         mainActivity.userJoinRoute3 = userJoinRouteCheck[2]
         mainActivity.userJoinRoute4 = userJoinRouteCheck[3]
         mainActivity.userJoinRoute5 = userJoinRouteCheck[4]
+
+
 
         mainActivity.saveUserInfo()
 

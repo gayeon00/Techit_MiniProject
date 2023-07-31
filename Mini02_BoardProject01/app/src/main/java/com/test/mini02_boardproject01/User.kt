@@ -1,6 +1,7 @@
 package com.test.mini02_boardproject01
 
 data class User(
+    var userIdx:Long,
     var userId: String,
     var userPw: String,
     var userNickname: String,
