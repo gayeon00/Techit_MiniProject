@@ -1,17 +1,15 @@
 package com.test.mini02_boardproject03.user
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.test.mini02_boardproject03.R
-import com.test.mini02_boardproject03.board.BoardActivity
 import com.test.mini02_boardproject03.databinding.FragmentAddUserInfoBinding
+import com.test.mini02_boardproject03.databinding.FragmentLogInBinding
 
 class AddUserInfoFragment : Fragment() {
     lateinit var fragmentAddUserInfoBinding: FragmentAddUserInfoBinding
@@ -49,29 +47,39 @@ class AddUserInfoFragment : Fragment() {
             }
 
             buttonCompleteJoin.setOnClickListener {
+                (activity as MainActivity).hideSoftInput()
+
                 // 가입하기
                 val userId = requireArguments().getString("userId")
                 val userPw = requireArguments().getString("userPw")
 
                 val userNickname = textInputEditTextAddInfoName.text.toString()
-                val userAge = textInputEditTextAddInfoAge.text.toString().toLong()
+                val userAge = textInputEditTextAddInfoAge.text.toString()
 
                 val userJoinRoute = getUserJoinRoute()
 
-                saveUserInfoToFirebase(userId!!, userPw!!, userNickname, userAge, userJoinRoute)
+                if (validateAddUerInfoFields(userNickname, userAge)) {
+                    saveUserInfoToFirebase(userId!!, userPw!!, userNickname, userAge.toLong(), userJoinRoute)
+                    //기기의 아이디를 식별하기 위해 preference에도 저장
+                    saveUserIdPwToPreferences()
 
-                //boardActivity로 이동
-                val newIntent = Intent(requireActivity(), BoardActivity::class.java)
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(newIntent)
-                requireActivity().finish()
-
+                    //boardActivity로 이동
+                    (activity as MainActivity).goToBoardActivity()
+                }
             }
         }
         // Inflate the layout for this fragment
         return fragmentAddUserInfoBinding.root
     }
 
+    private fun saveUserIdPwToPreferences() {
+        val preferences = requireActivity().getSharedPreferences("data", Context.MODE_PRIVATE)
+
+        val editor = preferences.edit()
+        editor.putString("userId", requireArguments().getString("userId"))
+        editor.putString("userPw", requireArguments().getString("userPw"))
+        editor.commit()
+    }
 
     private fun saveUserInfoToFirebase(
         userId: String,
@@ -96,5 +104,20 @@ class AddUserInfoFragment : Fragment() {
             }
         }
         return tmp.toList()
+    }
+
+    private fun FragmentAddUserInfoBinding.validateAddUerInfoFields(userNickname: String, userAge: String): Boolean {
+        if (userNickname.isEmpty()) {
+            textInputLayoutAddInfoName.error = "닉네임을 입력해주세요."
+            return false
+        }
+
+        if (userAge.isEmpty()) {
+            textInputLayoutAddInfoName.error = null
+            textInputLayoutAddInfoAge.error = "나이를 입력해주세요."
+            return false
+        }
+
+        return true
     }
 }
