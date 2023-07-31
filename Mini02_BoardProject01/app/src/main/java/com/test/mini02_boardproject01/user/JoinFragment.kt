@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.fragment
+package com.test.mini02_boardproject01.user
 
 import android.content.Context
 import android.os.Bundle

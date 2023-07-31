@@ -1,15 +1,16 @@
-package com.test.mini02_boardproject01.fragment
+package com.test.mini02_boardproject01.user
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import com.test.mini02_boardproject01.MainActivity
-import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.FragmentAddUserInfoBinding
 
@@ -38,22 +39,7 @@ class AddUserInfoFragment : Fragment() {
             }
 
             buttonCompleteJoin.setOnClickListener {
-                mainActivity.userNickname = textInputEditTextAddInfoName.text.toString()
-                mainActivity.userAge = textInputEditTextAddInfoAge.text.toString()
-
-                val result = mutableListOf<String>()
-                for (idx in 0 until 5) {
-                    if (userJoinRouteCheck[idx]) result.add(userJoinRoute[idx])
-                }
-
-                mainActivity.userJoinRoute = result.toMutableSet()
-
-                mainActivity.savePreference()
-
-                val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(newIntent)
-                mainActivity.finish()
+                validateFieldsAndSave()
             }
 
             checkBox.setOnCheckedChangeListener { compoundButton, b ->
@@ -75,6 +61,52 @@ class AddUserInfoFragment : Fragment() {
         }
         // Inflate the layout for this fragment
         return fragmentAddUserInfoBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        fragmentAddUserInfoBinding.run {
+            textInputEditTextAddInfoName.run {
+                requestFocus()
+
+                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+
+            }
+        }
+    }
+
+    private fun FragmentAddUserInfoBinding.validateFieldsAndSave() {
+        val name = textInputEditTextAddInfoName.text.toString()
+        val age = textInputEditTextAddInfoAge.text.toString()
+
+        if (name.isEmpty()) {
+            textInputLayoutAddInfoName.error = "닉네임을 입력해주세요."
+            return
+        }
+
+        if (age.isEmpty()) {
+            textInputLayoutAddInfoAge.error = "나이를 입력해주세요."
+            return
+        }
+
+        mainActivity.userNickname = name
+        mainActivity.userAge = age
+
+        val result = mutableListOf<String>()
+        for (idx in 0 until 5) {
+            if (userJoinRouteCheck[idx]) result.add(userJoinRoute[idx])
+        }
+
+        mainActivity.userJoinRoute = result.toMutableSet()
+
+        mainActivity.savePreference()
+
+        val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(newIntent)
+        mainActivity.finish()
     }
 
 }

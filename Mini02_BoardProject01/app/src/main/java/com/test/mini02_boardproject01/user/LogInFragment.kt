@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.fragment
+package com.test.mini02_boardproject01.user
 
 import android.content.Context
 import android.content.Intent
@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.board.BoardMainActivity
