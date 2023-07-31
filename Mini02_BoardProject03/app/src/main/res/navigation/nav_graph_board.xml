@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_board"
+    app:startDestination="@id/postListFragment">
+
+    <fragment
+        android:id="@+id/postListFragment"
+        android:name="com.test.mini02_boardproject03.board.PostListFragment"
+        android:label="전체게시판"
+        tools:layout="@layout/fragment_post_list" />
+    <fragment
+        android:id="@+id/postFreeFragment"
+        android:name="com.test.mini02_boardproject03.board.PostFreeFragment"
+        android:label="자유게시판"
+        tools:layout="@layout/fragment_post_free" />
+    <fragment
+        android:id="@+id/postHumorFragment"
+        android:name="com.test.mini02_boardproject03.board.PostHumorFragment"
+        android:label="유머게시판"
+        tools:layout="@layout/fragment_post_humor" />
+    <fragment
+        android:id="@+id/postSportsFragment"
+        android:name="com.test.mini02_boardproject03.board.PostSportsFragment"
+        android:label="스포츠게시판"
+        tools:layout="@layout/fragment_post_sports" />
+    <fragment
+        android:id="@+id/postQnaFragment"
+        android:name="com.test.mini02_boardproject03.board.PostQnaFragment"
+        android:label="질문게시판"
+        tools:layout="@layout/fragment_post_qna" />
+    <fragment
+        android:id="@+id/modifyUserFragment"
+        android:name="com.test.mini02_boardproject03.board.ModifyUserFragment"
+        android:label="사용자 정보 수정"
+        tools:layout="@layout/fragment_modify_user" />
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.test.mini02_boardproject03.user.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main"/>
+    <activity
+        android:id="@+id/mainActivity2"
+        android:name="com.test.mini02_boardproject03.user.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
+</navigation>
