@@ -7,9 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.FragmentAddUserInfoBinding
@@ -92,16 +92,18 @@ class AddUserInfoFragment : Fragment() {
         }
 
         mainActivity.userNickname = name
-        mainActivity.userAge = age
+        mainActivity.userAge = age.toLong()
 
-        val result = mutableListOf<String>()
-        for (idx in 0 until 5) {
-            if (userJoinRouteCheck[idx]) result.add(userJoinRoute[idx])
-        }
 
-        mainActivity.userJoinRoute = result.toMutableSet()
+        mainActivity.userJoinRoute1 = userJoinRouteCheck[0]
+        mainActivity.userJoinRoute2 = userJoinRouteCheck[1]
+        mainActivity.userJoinRoute3 = userJoinRouteCheck[2]
+        mainActivity.userJoinRoute4 = userJoinRouteCheck[3]
+        mainActivity.userJoinRoute5 = userJoinRouteCheck[4]
 
-        mainActivity.savePreference()
+        mainActivity.saveUserInfo()
+
+        Snackbar.make(fragmentAddUserInfoBinding.root, "가입이 완료됐습니다.", Snackbar.LENGTH_SHORT).show()
 
         val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
         newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)

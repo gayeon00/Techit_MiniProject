@@ -4,9 +4,11 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +16,10 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -25,8 +31,12 @@ class MainActivity : AppCompatActivity() {
     var userId = ""
     var userPw = ""
     var userNickname = ""
-    var userAge = ""
-    var userJoinRoute = mutableSetOf<String>()
+    var userAge = 0L
+    var userJoinRoute1 = false
+    var userJoinRoute2= false
+    var userJoinRoute3= false
+    var userJoinRoute4= false
+    var userJoinRoute5= false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,16 +47,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
 
         navController = findNavController(R.id.nav_host_fragment)
-        preferences = getSharedPreferences("data", MODE_PRIVATE)
-
-        if(preferences!=null) {
-            userId = preferences!!.getString("userId","user").toString()
-            userPw = preferences!!.getString("userPw","user").toString()
-            userNickname = preferences!!.getString("userNickname","user").toString()
-            userAge = preferences!!.getString("userAge","user").toString()
-            userJoinRoute = preferences!!.getStringSet("userJoinRoute",
-                mutableSetOf<String>()) as MutableSet<String>
-        }
+//        preferences = getSharedPreferences("data", MODE_PRIVATE)
+//
+//        if (preferences != null) {
+//            userId = preferences!!.getString("userId", "user").toString()
+//            userPw = preferences!!.getString("userPw", "user").toString()
+//            userNickname = preferences!!.getString("userNickname", "user").toString()
+//            userAge = preferences!!.getString("userAge", "user").toString().toLong()
+//            userJoinRoute = preferences!!.getStringSet(
+//                "userJoinRoute",
+//                mutableSetOf<String>()
+//            ) as MutableSet<String>
+//        }
     }
 
     //splash screen 커스터마이징
@@ -92,14 +104,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun savePreference() {
-        val editor = preferences!!.edit()
-        editor.putString("userId", userId)
-        editor.putString("userPw", userPw)
-        editor.putString("userNickname", userNickname)
-        editor.putString("userAge", userAge)
-        editor.putStringSet("userJoinRoute", userJoinRoute.toSet())
+    fun saveUserInfo() {
+        val database = Firebase.database
+        val myRef = database.reference
 
-        editor.apply()
+        val user = User(userId, userPw, userNickname, userAge, userJoinRoute1, userJoinRoute2, userJoinRoute3, userJoinRoute4, userJoinRoute5)
+        myRef.child("users").child(userId).setValue(user)
     }
+
+//    fun loadUserInfo(userId: String) {
+//        val database = Firebase.database
+//        val myRef = database.reference
+//
+//        myRef.child("users").child(userId).get().addOnSuccessListener {
+//            Log.i("firebase", "Got value ${it.value}")
+//            this.userId = userId
+//            userPw = it.child("userPw").value as String
+//            userNickname = it.child("userNickname").value as String
+//            userAge = it.child("userAge").value as Long
+//            userJoinRoute1 = it.child("userJoinRoute").value as MutableSet<String>
+//        }.addOnFailureListener {
+//            Log.e("firebase", "Error getting data", it)
+//        }
+//    }
 }
