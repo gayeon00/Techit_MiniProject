@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    tools:context=".user.MainActivity" >
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/userToolbar"
@@ -21,5 +21,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
+        app:navGraph="@navigation/nav_graph_user" />
 </LinearLayout>

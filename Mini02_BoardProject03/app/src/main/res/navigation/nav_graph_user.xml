@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/logInFragment">
+
+    <fragment
+        android:id="@+id/logInFragment"
+        android:name="com.test.mini02_boardproject03.user.LogInFragment"
+        android:label="로그인"
+        tools:layout="@layout/fragment_log_in">
+        <action
+            android:id="@+id/action_logInFragment_to_joinFragment"
+            app:destination="@id/joinFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/joinFragment"
+        android:name="com.test.mini02_boardproject03.user.JoinFragment"
+        android:label="회원가입"
+        tools:layout="@layout/fragment_join">
+        <action
+            android:id="@+id/action_joinFragment_to_addUserInfoFragment"
+            app:destination="@id/addUserInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addUserInfoFragment"
+        android:name="com.test.mini02_boardproject03.user.AddUserInfoFragment"
+        android:label="추가정보입력"
+        tools:layout="@layout/fragment_add_user_info" >
+        <argument
+            android:name="userId"
+            app:argType="string"
+            android:defaultValue="userId" />
+        <argument
+            android:name="userPw"
+            app:argType="string"
+            android:defaultValue="userPw" />
+    </fragment>
+</navigation>
