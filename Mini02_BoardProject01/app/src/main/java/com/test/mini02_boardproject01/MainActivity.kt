@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     var userJoinRoute4 = false
     var userJoinRoute5 = false
 
+    lateinit var loginUser: User
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val splashScreen = installSplashScreen()
@@ -106,32 +108,32 @@ class MainActivity : AppCompatActivity() {
 
         var userIdx = 0L
 
-        userIdxRef.get().addOnCompleteListener {
-            for (a1 in it.result.children) {
-                userIdx = a1.value as Long
-            }
-        }
+        userIdxRef.get().addOnCompleteListener { task ->
+            //현재 사용자 순서 값을 가져온다.
+            userIdx = task.result.value as Long
 
-        val usersRef = database.reference.child("users")
-        val user = User(
-            ++userIdx,
-            userId,
-            userPw,
-            userNickname,
-            userAge,
-            userJoinRoute1,
-            userJoinRoute2,
-            userJoinRoute3,
-            userJoinRoute4,
-            userJoinRoute5
-        )
-        usersRef.child(userId).setValue(user).addOnCompleteListener {
-            database.reference.child("userIdx").get().addOnCompleteListener {
-                for (a1 in it.result.children) {
-                    a1.ref.setValue(userIdx)
+            val usersRef = database.reference.child("users")
+            val user = User(
+                ++userIdx,
+                userId,
+                userPw,
+                userNickname,
+                userAge,
+                userJoinRoute1,
+                userJoinRoute2,
+                userJoinRoute3,
+                userJoinRoute4,
+                userJoinRoute5
+            )
+            usersRef.child(userId).setValue(user).addOnCompleteListener {
+                userIdxRef.get().addOnCompleteListener {
+                    it.result.ref.setValue(userIdx)
                 }
             }
+
         }
+
+
     }
 
 //    fun loadUserInfo(userId: String) {

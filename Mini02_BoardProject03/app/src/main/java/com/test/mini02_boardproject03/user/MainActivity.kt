@@ -1,8 +1,8 @@
 package com.test.mini02_boardproject03.user
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     fun hideSoftInput() {
         val imm =
             getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        if (currentFocus != null) {
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
     }
 }

@@ -35,14 +35,4 @@
         android:name="com.test.mini02_boardproject03.board.ModifyUserFragment"
         android:label="사용자 정보 수정"
         tools:layout="@layout/fragment_modify_user" />
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.test.mini02_boardproject03.user.MainActivity"
-        android:label="activity_main"
-        tools:layout="@layout/activity_main"/>
-    <activity
-        android:id="@+id/mainActivity2"
-        android:name="com.test.mini02_boardproject03.user.MainActivity"
-        android:label="activity_main"
-        tools:layout="@layout/activity_main" />
 </navigation>
