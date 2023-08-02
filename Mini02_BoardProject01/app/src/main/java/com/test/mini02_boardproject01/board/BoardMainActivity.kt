@@ -1,6 +1,8 @@
 package com.test.mini02_boardproject01.board
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.R
+import com.test.mini02_boardproject01.User
 import com.test.mini02_boardproject01.databinding.ActivityBoardMainBinding
 import com.test.mini02_boardproject01.databinding.NavHeaderBinding
 
@@ -17,6 +20,20 @@ class BoardMainActivity : AppCompatActivity() {
 
     lateinit var drawerLayout: DrawerLayout
     lateinit var navController: NavController
+
+    lateinit var loginUser:User
+
+    // 게시판 종류
+    val boardTypeList = arrayOf(
+        "자유게시판", "유머게시판", "질문게시판", "스포츠게시판"
+    )
+
+    // 확인할 권한 목록
+    val permissionList = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.ACCESS_MEDIA_LOCATION,
+        Manifest.permission.INTERNET
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +44,11 @@ class BoardMainActivity : AppCompatActivity() {
         drawerLayout = activityBoardMainBinding.drawerLayout
         navController = findNavController(R.id.nav_host_fragment_activity_board_main)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            loginUser = intent.getSerializableExtra("user",User::class.java)!!
+        }
+
+        requestPermissions(permissionList, 0)
 //        // 액션바 설정
 //        appBarConfiguration = AppBarConfiguration(
 //            setOf(

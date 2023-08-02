@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.test.mini02_boardproject01.board.BoardMainActivity
 import com.test.mini02_boardproject01.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -134,6 +136,14 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    fun goToBoardMainActivity() {
+        val newIntent = Intent(this, BoardMainActivity::class.java)
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        newIntent.putExtra("user", loginUser)
+        startActivity(newIntent)
+        finish()
     }
 
 //    fun loadUserInfo(userId: String) {

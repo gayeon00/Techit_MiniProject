@@ -109,10 +109,7 @@ class AddUserInfoFragment : Fragment() {
 
         Snackbar.make(fragmentAddUserInfoBinding.root, "가입이 완료됐습니다.", Snackbar.LENGTH_SHORT).show()
 
-        val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(newIntent)
-        mainActivity.finish()
+        mainActivity.goToBoardMainActivity()
     }
 
 }

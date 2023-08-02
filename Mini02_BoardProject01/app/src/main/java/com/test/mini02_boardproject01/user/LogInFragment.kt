@@ -96,7 +96,7 @@ class LogInFragment : Fragment() {
                         mainActivity.loginUser = User(userIdx, userId, userPw, userNickname, userAge, userJoinRoute1, userJoinRoute2, userJoinRoute3, userJoinRoute4, userJoinRoute5)
                         Snackbar.make(fragmentLogInBinding.root, "로그인 되었습니다", Snackbar.LENGTH_SHORT).show()
 
-                        goToBoardMainActivity()
+                        mainActivity.goToBoardMainActivity()
                     }
                 }
 
@@ -113,13 +113,6 @@ class LogInFragment : Fragment() {
                 builder.show()
             }
         }
-    }
-
-    private fun goToBoardMainActivity() {
-        val newIntent = Intent(mainActivity, BoardMainActivity::class.java)
-        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(newIntent)
-        mainActivity.finish()
     }
 
     private fun FragmentLogInBinding.validateLoginFields(): Boolean {

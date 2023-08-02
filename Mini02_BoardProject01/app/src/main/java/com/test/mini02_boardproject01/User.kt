@@ -1,5 +1,7 @@
 package com.test.mini02_boardproject01
 
+import java.io.Serializable
+
 data class User(
     var userIdx:Long,
     var userId: String,
@@ -11,4 +13,4 @@ data class User(
     var userJoinRoute3: Boolean,
     var userJoinRoute4: Boolean,
     var userJoinRoute5: Boolean
-)
+):Serializable
