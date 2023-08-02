@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -29,6 +30,7 @@ import com.google.firebase.storage.ktx.storage
 import com.test.mini02_boardproject01.Post
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostWriteBinding
+import com.test.mini02_boardproject01.domain.PostViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,8 +40,11 @@ class PostWriteFragment : Fragment() {
     lateinit var fragmentPostWriteBinding: FragmentPostWriteBinding
     lateinit var boardMainActivity: BoardMainActivity
 
+    lateinit var postViewModel: PostViewModel
+
     // 게시판 종류
     var boardType = 0
+
 
     // 업로드할 이미지의 Uri
     var uploadUri: Uri? = null
@@ -62,6 +67,8 @@ class PostWriteFragment : Fragment() {
         cameraLauncher = cameraSetting(fragmentPostWriteBinding.imageView)
         //앨범 설정
         albumLauncher = albumSetting(fragmentPostWriteBinding.imageView)
+
+        postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
 
         fragmentPostWriteBinding.run {
             materialToolbar4.setOnMenuItemClickListener { menu ->
@@ -169,6 +176,8 @@ class PostWriteFragment : Fragment() {
                                                     "저장됐습니다.",
                                                     Snackbar.LENGTH_SHORT
                                                 ).show()
+
+                                                postViewModel.setPost(post)
                                                 findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
                                             }
                                         } else {
@@ -177,6 +186,8 @@ class PostWriteFragment : Fragment() {
                                                 "저장됐습니다.",
                                                 Snackbar.LENGTH_SHORT
                                             ).show()
+
+                                            postViewModel.setPost(post)
                                             findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
                                         }
                                     }
@@ -234,6 +245,8 @@ class PostWriteFragment : Fragment() {
                 val bitmap3 =
                     Bitmap.createBitmap(bitmap2, 0, 0, bitmap2.width, bitmap2.height, matrix, false)
                 previewImageView.setImageBitmap(bitmap3)
+
+                postViewModel.setImage(bitmap3)
             }
         }
 
@@ -286,6 +299,7 @@ class PostWriteFragment : Fragment() {
                         val bitmap = ImageDecoder.decodeBitmap(source)
 
                         previewImageView.setImageBitmap(bitmap)
+                        postViewModel.setImage(bitmap)
                     } else {
                         // 컨텐츠 프로바이더를 통해 이미지 데이터 정보를 가져온다.
                         val cursor = boardMainActivity.contentResolver.query(
@@ -301,6 +315,7 @@ class PostWriteFragment : Fragment() {
                             // 이미지를 생성하여 보여준다.
                             val bitmap = BitmapFactory.decodeFile(source)
                             previewImageView.setImageBitmap(bitmap)
+                            postViewModel.setImage(bitmap)
                         }
                     }
                 }
