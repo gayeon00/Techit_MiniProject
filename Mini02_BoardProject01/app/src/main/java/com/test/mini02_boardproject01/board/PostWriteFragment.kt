@@ -14,6 +14,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +46,8 @@ class PostWriteFragment : Fragment() {
     // 게시판 종류
     var boardType = 0
 
-
+    //PostWriteFragment인지, PostModifyFragment인지
+    var isModify = false
     // 업로드할 이미지의 Uri
     var uploadUri: Uri? = null
 
@@ -69,108 +71,145 @@ class PostWriteFragment : Fragment() {
         albumLauncher = albumSetting(fragmentPostWriteBinding.imageView)
 
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
+        isModify = arguments?.getBoolean("isModify", false)!!
 
         fragmentPostWriteBinding.run {
-            materialToolbar4.setOnMenuItemClickListener { menu ->
-                when (menu.itemId) {
-                    R.id.item_camera -> {
-                        val newIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-                        //사진이 저장될 파일 이름
-                        val fileName = "/temp_upload.jpg"
-                        //경로
-                        val filePath = boardMainActivity.getExternalFilesDir(null).toString()
-                        //경로+파일이름
-                        val picPath = "${filePath}/${fileName}"
-
-                        //사진이 저장될 경로를 관리할 Uri객체를 만들어준다.
-                        //업로드할 때 사용할 Uri
-                        val file = File(picPath)
-                        uploadUri = FileProvider.getUriForFile(
-                            boardMainActivity, "com.test.mini02_boardproject01.file_provider", file
-                        )
-
-                        newIntent.putExtra(MediaStore.EXTRA_OUTPUT, uploadUri)
-                        cameraLauncher.launch(newIntent)
+            if(isModify) {
+                //감시자 달아줌
+                //modify일 경우 감시자 작동함
+                postViewModel.run {
+                    title.observe(requireActivity()) {
+                        textInputEditTextPostWriteSubject.setText(it)
                     }
-
-                    R.id.item_gallery -> {
-                        //앨범 띄우기
-                        val newIntent =
-                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        newIntent.setType("image/*")
-                        newIntent.putExtra(Intent.EXTRA_MIME_TYPES, arrayListOf("image/*"))
-                        albumLauncher.launch(newIntent)
+                    content.observe(requireActivity()) {
+                        textInputEditTextPostWriteText.setText(it)
                     }
+                    image.observe(requireActivity()) {
+                        imageView.setImageBitmap(it)
+                    }
+                }
 
-                    R.id.item_complete -> {
-                        //제목 내용 유효성 검사
-                        // 입력한 내용을 가져온다.
-                        val subject = textInputEditTextPostWriteSubject.text.toString()
-                        val text = textInputEditTextPostWriteText.text.toString()
+            }
 
-                        if (subject.isEmpty()) {
-                            val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                            builder.setTitle("제목 입력 오류")
-                            builder.setMessage("제목을 입력해주세요")
-                            builder.setPositiveButton("확인", null)
-                            builder.show()
-                            return@setOnMenuItemClickListener true
-                        }
 
-                        if (text.isEmpty()) {
-                            val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                            builder.setTitle("내용 입력 오류")
-                            builder.setMessage("내용을 입력해주세요")
-                            builder.setPositiveButton("확인", null)
-                            builder.show()
-                            return@setOnMenuItemClickListener true
-                        }
-                        if (boardType == 0) {
-                            val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                            builder.setTitle("게시판 종류 선택 오류")
-                            builder.setMessage("게시판 종류를 선택해주세요")
-                            builder.setPositiveButton("확인", null)
-                            builder.show()
-                            return@setOnMenuItemClickListener true
-                        }
+            materialToolbar4.run{
+                title = if(isModify) {
+                    "글 수정"
+                } else {
+                    "글 작성"
+                }
 
-                        val database = Firebase.database
-                        //게시글 인덱스 번호
-                        val postIdxRef = database.reference.child("postIdx")
-                        postIdxRef.get().addOnCompleteListener { task ->
-                            var postIdx = task.result.value as Long
-                            //게시글 인덱스 증가
-                            postIdx++
+                setOnMenuItemClickListener { menu ->
+                    when (menu.itemId) {
+                        R.id.item_camera -> {
+                            val newIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-                            //게시글 저장
-                            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            val writeDate = sdf.format(Date(System.currentTimeMillis()))
+                            //사진이 저장될 파일 이름
+                            val fileName = "/temp_upload.jpg"
+                            //경로
+                            val filePath = boardMainActivity.getExternalFilesDir(null).toString()
+                            //경로+파일이름
+                            val picPath = "${filePath}/${fileName}"
 
-                            val fileName = if (uploadUri == null) {
-                                "None"
-                            } else {
-                                "image/img_${System.currentTimeMillis()}.jpg"
-                            }
-
-                            val post = Post(
-                                postIdx,
-                                boardType.toLong(),
-                                subject,
-                                text,
-                                writeDate,
-                                fileName,
-                                boardMainActivity.loginUser.userIdx
+                            //사진이 저장될 경로를 관리할 Uri객체를 만들어준다.
+                            //업로드할 때 사용할 Uri
+                            val file = File(picPath)
+                            uploadUri = FileProvider.getUriForFile(
+                                boardMainActivity, "com.test.mini02_boardproject01.file_provider", file
                             )
 
-                            val postRef = database.reference.child("posts")
-                            postRef.push().setValue(post).addOnCompleteListener {
-                                postIdxRef.get().addOnCompleteListener {
-                                    it.result.ref.setValue(postIdx).addOnCompleteListener {
-                                        if (uploadUri != null) {
-                                            val storage = Firebase.storage
-                                            val imageRef = storage.reference.child(fileName)
-                                            imageRef.putFile(uploadUri!!).addOnCompleteListener {
+                            newIntent.putExtra(MediaStore.EXTRA_OUTPUT, uploadUri)
+                            cameraLauncher.launch(newIntent)
+                        }
+
+                        R.id.item_gallery -> {
+                            //앨범 띄우기
+                            val newIntent =
+                                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                            newIntent.setType("image/*")
+                            newIntent.putExtra(Intent.EXTRA_MIME_TYPES, arrayListOf("image/*"))
+                            albumLauncher.launch(newIntent)
+                        }
+
+                        R.id.item_complete -> {
+                            //제목 내용 유효성 검사
+                            // 입력한 내용을 가져온다.
+                            val subject = textInputEditTextPostWriteSubject.text.toString()
+                            val text = textInputEditTextPostWriteText.text.toString()
+
+                            if (subject.isEmpty()) {
+                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                builder.setTitle("제목 입력 오류")
+                                builder.setMessage("제목을 입력해주세요")
+                                builder.setPositiveButton("확인", null)
+                                builder.show()
+                                return@setOnMenuItemClickListener true
+                            }
+
+                            if (text.isEmpty()) {
+                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                builder.setTitle("내용 입력 오류")
+                                builder.setMessage("내용을 입력해주세요")
+                                builder.setPositiveButton("확인", null)
+                                builder.show()
+                                return@setOnMenuItemClickListener true
+                            }
+                            if (boardType == 0) {
+                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                builder.setTitle("게시판 종류 선택 오류")
+                                builder.setMessage("게시판 종류를 선택해주세요")
+                                builder.setPositiveButton("확인", null)
+                                builder.show()
+                                return@setOnMenuItemClickListener true
+                            }
+
+                            val database = Firebase.database
+                            //게시글 인덱스 번호
+                            val postIdxRef = database.reference.child("postIdx")
+                            postIdxRef.get().addOnCompleteListener { task ->
+                                var postIdx = task.result.value as Long
+                                //게시글 인덱스 증가
+                                postIdx++
+
+                                //게시글 저장
+                                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                val writeDate = sdf.format(Date(System.currentTimeMillis()))
+
+                                val fileName = if (uploadUri == null) {
+                                    "None"
+                                } else {
+                                    "image/img_${System.currentTimeMillis()}.jpg"
+                                }
+
+                                val post = Post(
+                                    postIdx,
+                                    boardType.toLong(),
+                                    subject,
+                                    text,
+                                    writeDate,
+                                    fileName,
+                                    boardMainActivity.loginUser.userIdx
+                                )
+
+                                val postRef = database.reference.child("posts")
+                                postRef.push().setValue(post).addOnCompleteListener {
+                                    postIdxRef.get().addOnCompleteListener {
+                                        it.result.ref.setValue(postIdx).addOnCompleteListener {
+                                            if (uploadUri != null) {
+                                                val storage = Firebase.storage
+                                                val imageRef = storage.reference.child(fileName)
+                                                imageRef.putFile(uploadUri!!).addOnCompleteListener {
+                                                    Snackbar.make(
+                                                        fragmentPostWriteBinding.root,
+                                                        "저장됐습니다.",
+                                                        Snackbar.LENGTH_SHORT
+                                                    ).show()
+
+                                                    postViewModel.setPost(post)
+                                                    findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
+                                                }
+                                            } else {
                                                 Snackbar.make(
                                                     fragmentPostWriteBinding.root,
                                                     "저장됐습니다.",
@@ -180,25 +219,16 @@ class PostWriteFragment : Fragment() {
                                                 postViewModel.setPost(post)
                                                 findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
                                             }
-                                        } else {
-                                            Snackbar.make(
-                                                fragmentPostWriteBinding.root,
-                                                "저장됐습니다.",
-                                                Snackbar.LENGTH_SHORT
-                                            ).show()
-
-                                            postViewModel.setPost(post)
-                                            findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
                                         }
-                                    }
 
+                                    }
                                 }
                             }
-                        }
 
+                        }
                     }
+                    true
                 }
-                true
             }
 
             button.setOnClickListener {

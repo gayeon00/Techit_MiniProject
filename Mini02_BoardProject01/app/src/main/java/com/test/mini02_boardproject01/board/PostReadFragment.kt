@@ -46,7 +46,9 @@ class PostReadFragment : Fragment() {
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.item_edit -> {
-                            findNavController().navigate(R.id.action_postReadFragment_to_postModifyFragment)
+                            val arg = Bundle()
+                            arg.putBoolean("isModify", true)
+                            findNavController().navigate(R.id.action_postReadFragment_to_postWriteFragment, arg)
                         }
 
                         R.id.item_delete -> {

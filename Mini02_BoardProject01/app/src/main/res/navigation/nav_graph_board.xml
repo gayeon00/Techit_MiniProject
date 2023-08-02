@@ -56,6 +56,9 @@
             app:exitAnim="@anim/exit_anim"
             app:popEnterAnim="@anim/pop_enter_anim"
             app:popExitAnim="@anim/pop_exit_anim" />
+        <argument
+            android:name="isModify"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/postReadFragment"
@@ -63,8 +66,8 @@
         android:label="fragment_post_read"
         tools:layout="@layout/fragment_post_read" >
         <action
-            android:id="@+id/action_postReadFragment_to_postModifyFragment"
-            app:destination="@id/postModifyFragment"
+            android:id="@+id/action_postReadFragment_to_postWriteFragment"
+            app:destination="@id/postWriteFragment"
             app:enterAnim="@anim/enter_anim"
             app:exitAnim="@anim/exit_anim"
             app:popEnterAnim="@anim/pop_enter_anim"
@@ -78,20 +81,5 @@
             app:exitAnim="@anim/pop_exit_anim"
             app:popEnterAnim="@anim/enter_anim"
             app:popExitAnim="@anim/exit_anim" />
-    </fragment>
-    <fragment
-        android:id="@+id/postModifyFragment"
-        android:name="com.test.mini02_boardproject01.board.PostModifyFragment"
-        android:label="fragment_post_modify"
-        tools:layout="@layout/fragment_post_modify" >
-        <action
-            android:id="@+id/action_postModifyFragment_to_postReadFragment"
-            app:destination="@id/postReadFragment"
-            app:popUpTo="@id/postReadFragment"
-            app:popUpToInclusive="true"
-            app:enterAnim="@anim/enter_anim"
-            app:exitAnim="@anim/exit_anim"
-            app:popEnterAnim="@anim/pop_enter_anim"
-            app:popExitAnim="@anim/pop_exit_anim" />
     </fragment>
 </navigation>

@@ -7,10 +7,9 @@ import com.test.mini02_boardproject01.Post
 class PostRepository {
 
     companion object {
-
+        private val database = Firebase.database
         fun getOne(idx: Long): Post {
             //firebase에서 인덱스가 idx인 놈 가져오기
-            val database = Firebase.database
             val postsRef = database.reference.child("posts")
 
             var post = Post()

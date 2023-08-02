@@ -35,17 +35,29 @@ class PostListFragment : Fragment() {
             recyclerViewAll.run {
                 adapter = AllRecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
-                addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL))
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        context,
+                        MaterialDividerItemDecoration.VERTICAL
+                    )
+                )
             }
 
             recyclerViewSearchList.run {
                 adapter = ResultRecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
-                addItemDecoration(MaterialDividerItemDecoration(context, MaterialDividerItemDecoration.VERTICAL))
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        context,
+                        MaterialDividerItemDecoration.VERTICAL
+                    )
+                )
             }
 
             searchBar.setOnMenuItemClickListener {
-            //메뉴 누르면 수행할 일
+                //메뉴 누르면 수행할 일
+                val arg = Bundle()
+                arg.putBoolean("isModify", false)
                 findNavController().navigate(R.id.action_postListFragment_to_postWriteFragment)
                 true
             }
