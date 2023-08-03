@@ -8,22 +8,22 @@
 
     <fragment
         android:id="@+id/item_board_main_user_info"
-        android:name="com.test.mini02_boardproject01.board.ModifyUserFragment"
+        android:name="com.test.mini02_boardproject01.ui.board.ModifyUserFragment"
         android:label="fragment_modify_user"
         tools:layout="@layout/fragment_modify_user" />
     <activity
         android:id="@+id/item_board_main_logout"
-        android:name="com.test.mini02_boardproject01.MainActivity"
+        android:name="com.test.mini02_boardproject01.ui.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" />
     <activity
         android:id="@+id/item_board_main_sign_out"
-        android:name="com.test.mini02_boardproject01.MainActivity"
+        android:name="com.test.mini02_boardproject01.ui.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" />
     <fragment
         android:id="@+id/postListFragment"
-        android:name="com.test.mini02_boardproject01.board.PostListFragment"
+        android:name="com.test.mini02_boardproject01.ui.board.PostListFragment"
         android:label="fragment_post_list"
         tools:layout="@layout/fragment_post_list" >
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/postWriteFragment"
-        android:name="com.test.mini02_boardproject01.board.PostWriteFragment"
+        android:name="com.test.mini02_boardproject01.ui.board.PostWriteFragment"
         android:label="fragment_post_write"
         tools:layout="@layout/fragment_post_write" >
         <action
@@ -62,7 +62,7 @@
     </fragment>
     <fragment
         android:id="@+id/postReadFragment"
-        android:name="com.test.mini02_boardproject01.board.PostReadFragment"
+        android:name="com.test.mini02_boardproject01.ui.board.PostReadFragment"
         android:label="fragment_post_read"
         tools:layout="@layout/fragment_post_read" >
         <action

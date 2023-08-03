@@ -1,7 +1,6 @@
-package com.test.mini02_boardproject01.user
+package com.test.mini02_boardproject01.ui.user
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +9,9 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.test.mini02_boardproject01.MainActivity
-import com.test.mini02_boardproject01.board.BoardMainActivity
+import com.test.mini02_boardproject01.data.model.User
+import com.test.mini02_boardproject01.data.repository.UserRepository
+import com.test.mini02_boardproject01.ui.MainActivity
 import com.test.mini02_boardproject01.databinding.FragmentAddUserInfoBinding
 
 class AddUserInfoFragment : Fragment() {
@@ -28,6 +26,16 @@ class AddUserInfoFragment : Fragment() {
         "지역카페 (맘카페 등)",
         "기타"
     )
+
+    var userId = ""
+    var userPw = ""
+    var userNickname = ""
+    var userAge = 0L
+    var userJoinRoute1 = false
+    var userJoinRoute2 = false
+    var userJoinRoute3 = false
+    var userJoinRoute4 = false
+    var userJoinRoute5 = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,23 +101,55 @@ class AddUserInfoFragment : Fragment() {
             return
         }
 
-        mainActivity.userNickname = name
-        mainActivity.userAge = age.toLong()
+        userNickname = name
+        userAge = age.toLong()
 
 
-        mainActivity.userJoinRoute1 = userJoinRouteCheck[0]
-        mainActivity.userJoinRoute2 = userJoinRouteCheck[1]
-        mainActivity.userJoinRoute3 = userJoinRouteCheck[2]
-        mainActivity.userJoinRoute4 = userJoinRouteCheck[3]
-        mainActivity.userJoinRoute5 = userJoinRouteCheck[4]
+        userJoinRoute1 = userJoinRouteCheck[0]
+        userJoinRoute2 = userJoinRouteCheck[1]
+        userJoinRoute3 = userJoinRouteCheck[2]
+        userJoinRoute4 = userJoinRouteCheck[3]
+        userJoinRoute5 = userJoinRouteCheck[4]
 
 
 
-        mainActivity.saveUserInfo()
+        saveUserInfo() {
+            Snackbar.make(fragmentAddUserInfoBinding.root, "가입이 완료됐습니다.", Snackbar.LENGTH_SHORT).show()
+            mainActivity.goToBoardMainActivity()
+        }
 
-        Snackbar.make(fragmentAddUserInfoBinding.root, "가입이 완료됐습니다.", Snackbar.LENGTH_SHORT).show()
 
-        mainActivity.goToBoardMainActivity()
+    }
+
+    private fun saveUserInfo(function: () -> Unit) {
+        var userIdx = 0L
+
+        UserRepository.getUserIdx { task ->
+            //현재 사용자 순서 값을 가져온다.
+            userIdx = task.result.value as Long
+
+            val user = User(
+                ++userIdx,
+                userId,
+                userPw,
+                userNickname,
+                userAge,
+                userJoinRoute1,
+                userJoinRoute2,
+                userJoinRoute3,
+                userJoinRoute4,
+                userJoinRoute5
+            )
+
+            //저장한다.
+            UserRepository.addUserInfo(user) {
+                UserRepository.setUserIdx(userIdx) {
+                    function()
+                }
+            }
+        }
+
+
     }
 
 }

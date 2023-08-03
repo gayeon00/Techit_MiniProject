@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.user
+package com.test.mini02_boardproject01.ui.user
 
 import android.content.Context
 import android.os.Bundle
@@ -7,22 +7,42 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.test.mini02_boardproject01.MainActivity
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentJoinBinding
+import com.test.mini02_boardproject01.domain.UserViewModel
+import com.test.mini02_boardproject01.ui.MainActivity
 
 class JoinFragment : Fragment() {
     lateinit var fragmentJoinBinding: FragmentJoinBinding
     lateinit var mainActivity: MainActivity
+    lateinit var userViewModel: UserViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         fragmentJoinBinding = FragmentJoinBinding.inflate(layoutInflater)
         mainActivity = activity as MainActivity
+
+        //viewModel 객체 가져오기
+        userViewModel = ViewModelProvider(mainActivity)[UserViewModel::class.java]
+
         // Inflate the layout for this fragment
         fragmentJoinBinding.run {
+
+            //userViewModel 감시자 달아주기
+            userViewModel.run {
+                userId.observe(mainActivity) {
+                    textInputEditTextJoinUserId.setText(it)
+                }
+                userPw.observe(mainActivity) {
+                    textInputEditTextJoinUserPw.setText(it)
+                }
+                userPw2.observe(mainActivity) {
+                    textInputEditTextJoinUserPwRe.setText(it)
+                }
+            }
 
             buttonGoToAddUserInfo.setOnClickListener {
                 validateLoginFields()
@@ -33,6 +53,12 @@ class JoinFragment : Fragment() {
             }
         }
         return fragmentJoinBinding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        userViewModel.reset()
     }
 
     private fun FragmentJoinBinding.validateLoginFields() {

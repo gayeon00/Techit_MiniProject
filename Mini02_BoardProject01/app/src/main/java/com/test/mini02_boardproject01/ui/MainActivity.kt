@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01
+package com.test.mini02_boardproject01.ui
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -15,28 +15,21 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.test.mini02_boardproject01.board.BoardMainActivity
+import com.test.mini02_boardproject01.R
+import com.test.mini02_boardproject01.data.model.User
+import com.test.mini02_boardproject01.data.repository.UserRepository
 import com.test.mini02_boardproject01.databinding.ActivityMainBinding
+import com.test.mini02_boardproject01.ui.board.BoardMainActivity
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var activityMainBinding: ActivityMainBinding
     lateinit var navController: NavController
-    var preferences: SharedPreferences? = null
 
     var userId = ""
     var userPw = ""
-    var userNickname = ""
-    var userAge = 0L
-    var userJoinRoute1 = false
-    var userJoinRoute2 = false
-    var userJoinRoute3 = false
-    var userJoinRoute4 = false
-    var userJoinRoute5 = false
 
-    lateinit var loginUser: User
+    var loginUser = User()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,39 +97,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun saveUserInfo() {
-        val database = Firebase.database
-        val userIdxRef = database.reference.child("userIdx")
 
-        var userIdx = 0L
-
-        userIdxRef.get().addOnCompleteListener { task ->
-            //현재 사용자 순서 값을 가져온다.
-            userIdx = task.result.value as Long
-
-            val usersRef = database.reference.child("users")
-            val user = User(
-                ++userIdx,
-                userId,
-                userPw,
-                userNickname,
-                userAge,
-                userJoinRoute1,
-                userJoinRoute2,
-                userJoinRoute3,
-                userJoinRoute4,
-                userJoinRoute5
-            )
-            usersRef.child(userId).setValue(user).addOnCompleteListener {
-                userIdxRef.get().addOnCompleteListener {
-                    it.result.ref.setValue(userIdx)
-                }
-            }
-
-        }
-
-
-    }
 
     fun goToBoardMainActivity() {
         val newIntent = Intent(this, BoardMainActivity::class.java)

@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.board
+package com.test.mini02_boardproject01.ui.board
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -15,10 +16,12 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostListBinding
 import com.test.mini02_boardproject01.databinding.RowPostListBinding
+import com.test.mini02_boardproject01.domain.PostViewModel
 
 class PostListFragment : Fragment() {
     lateinit var fragmentPostListBinding: FragmentPostListBinding
     lateinit var boardMainActivity: BoardMainActivity
+    lateinit var postViewModel: PostViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +33,9 @@ class PostListFragment : Fragment() {
         // show the ActionBar
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar?.show()
+
+        //TODO : recyclerView의 리스트 ViewModel로 연결해주기
+        postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
 
         fragmentPostListBinding.run {
             recyclerViewAll.run {

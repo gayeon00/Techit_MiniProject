@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.board
+package com.test.mini02_boardproject01.ui.board
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,8 +19,7 @@ class PostReadFragment : Fragment() {
     lateinit var postViewModel: PostViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         fragmentPostReadBinding = FragmentPostReadBinding.inflate(layoutInflater)
@@ -36,19 +35,22 @@ class PostReadFragment : Fragment() {
         }
 
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
-//        //viewmodel의 title, content 업데이트
-//        val arg = arguments?.getLong("postIdx")
-//        postViewModel.getOne(arg!!)
+        //viewmodel의 title, content 업데이트
+        //게시글 인덱스 번호를 받는다.
+        val readPostIdx = arguments?.getLong("postIdx")!!
+        postViewModel.setPostReadData(readPostIdx)
 
 
         fragmentPostReadBinding.run {
-            materialToolbar2.run{
+            materialToolbar2.run {
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.item_edit -> {
                             val arg = Bundle()
                             arg.putBoolean("isModify", true)
-                            findNavController().navigate(R.id.action_postReadFragment_to_postWriteFragment, arg)
+                            findNavController().navigate(
+                                R.id.action_postReadFragment_to_postWriteFragment, arg
+                            )
                         }
 
                         R.id.item_delete -> {
@@ -74,6 +76,12 @@ class PostReadFragment : Fragment() {
                 image.observe(requireActivity()) {
                     imageViewPostRead.setImageBitmap(it)
                 }
+                date.observe(requireActivity()) {
+                    textInputEditTextPostReadDate.setText(it)
+                }
+                writer.observe(requireActivity()) {
+                    textInputEditTextPostReadWriter.setText(it)
+                }
             }
 
         }
@@ -81,7 +89,6 @@ class PostReadFragment : Fragment() {
 
         return fragmentPostReadBinding.root
     }
-
 
 
 }

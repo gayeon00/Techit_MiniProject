@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.board
+package com.test.mini02_boardproject01.ui.board
 
 import android.content.Context
 import android.content.DialogInterface

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".board.PostReadFragment">
+    tools:context=".ui.board.PostReadFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/materialToolbar2"
@@ -42,8 +42,48 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     android:inputType="text"
-                    android:text="제목입니다." />
+                    android:text="제목입니다."
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutPostReadWriter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="7dp"
+                android:hint="작성자"
+                android:transitionGroup="true"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/textInputEditTextPostReadWriter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="text"
+                    android:text="작성자입니다"
+                    android:textColor="@android:color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayoutPostReadDate"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="7dp"
+                android:hint="날짜"
+                android:transitionGroup="true"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/textInputEditTextPostReadDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="text"
+                    android:text="날짜입니다"
+                    android:textColor="@android:color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayoutPostReadContent"
@@ -60,7 +100,8 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     android:inputType="text|textMultiLine"
-                    android:text="내용입니다" />
+                    android:text="내용입니다"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView

@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01.board
+package com.test.mini02_boardproject01.ui.board
 
 import android.content.DialogInterface
 import android.content.Intent
@@ -14,7 +14,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,11 +24,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import com.test.mini02_boardproject01.Post
 import com.test.mini02_boardproject01.R
+import com.test.mini02_boardproject01.data.model.Post
+import com.test.mini02_boardproject01.data.repository.PostRepository
 import com.test.mini02_boardproject01.databinding.FragmentPostWriteBinding
 import com.test.mini02_boardproject01.domain.PostViewModel
 import java.io.File
@@ -48,6 +45,7 @@ class PostWriteFragment : Fragment() {
 
     //PostWriteFragment인지, PostModifyFragment인지
     var isModify = false
+
     // 업로드할 이미지의 Uri
     var uploadUri: Uri? = null
 
@@ -75,7 +73,7 @@ class PostWriteFragment : Fragment() {
 
         fragmentPostWriteBinding.run {
 
-            if(isModify) {
+            if (isModify) {
                 //감시자 달아줌
                 //modify일 경우 감시자 작동함
                 postViewModel.run {
@@ -93,8 +91,8 @@ class PostWriteFragment : Fragment() {
             }
 
 
-            materialToolbar4.run{
-                title = if(isModify) {
+            materialToolbar4.run {
+                title = if (isModify) {
                     "글 수정"
                 } else {
                     "글 작성"
@@ -116,7 +114,9 @@ class PostWriteFragment : Fragment() {
                             //업로드할 때 사용할 Uri
                             val file = File(picPath)
                             uploadUri = FileProvider.getUriForFile(
-                                boardMainActivity, "com.test.mini02_boardproject01.file_provider", file
+                                boardMainActivity,
+                                "com.test.mini02_boardproject01.file_provider",
+                                file
                             )
 
                             newIntent.putExtra(MediaStore.EXTRA_OUTPUT, uploadUri)
@@ -126,7 +126,10 @@ class PostWriteFragment : Fragment() {
                         R.id.item_gallery -> {
                             //앨범 띄우기
                             val newIntent =
-                                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                                Intent(
+                                    Intent.ACTION_PICK,
+                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                                )
                             newIntent.setType("image/*")
                             newIntent.putExtra(Intent.EXTRA_MIME_TYPES, arrayListOf("image/*"))
                             albumLauncher.launch(newIntent)
@@ -164,10 +167,7 @@ class PostWriteFragment : Fragment() {
                                 return@setOnMenuItemClickListener true
                             }
 
-                            val database = Firebase.database
-                            //게시글 인덱스 번호
-                            val postIdxRef = database.reference.child("postIdx")
-                            postIdxRef.get().addOnCompleteListener { task ->
+                            PostRepository.getPostIdx { task ->
                                 var postIdx = task.result.value as Long
                                 //게시글 인덱스 증가
                                 postIdx++
@@ -192,35 +192,34 @@ class PostWriteFragment : Fragment() {
                                     boardMainActivity.loginUser.userIdx
                                 )
 
-                                val postRef = database.reference.child("posts")
-                                postRef.push().setValue(post).addOnCompleteListener {
-                                    postIdxRef.get().addOnCompleteListener {
-                                        it.result.ref.setValue(postIdx).addOnCompleteListener {
-                                            if (uploadUri != null) {
-                                                val storage = Firebase.storage
-                                                val imageRef = storage.reference.child(fileName)
-                                                imageRef.putFile(uploadUri!!).addOnCompleteListener {
-                                                    Snackbar.make(
-                                                        fragmentPostWriteBinding.root,
-                                                        "저장됐습니다.",
-                                                        Snackbar.LENGTH_SHORT
-                                                    ).show()
+                                PostRepository.addPostInfo(post) {
+                                    PostRepository.setPostIdx(postIdx) {
 
-                                                    postViewModel.setPost(post)
-                                                    findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
-                                                }
-                                            } else {
-                                                Snackbar.make(
+                                        if (uploadUri != null) {
+
+                                            PostRepository.uploadImage(fileName, uploadUri) {
+                                                showSnackBar(
                                                     fragmentPostWriteBinding.root,
-                                                    "저장됐습니다.",
-                                                    Snackbar.LENGTH_SHORT
-                                                ).show()
+                                                    "저장됐습니다."
+                                                )
 
-                                                postViewModel.setPost(post)
-                                                findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment)
+//                                                postViewModel.setPost(post)
+                                                val arg = Bundle()
+                                                arg.putLong("postIdx", postIdx)
+                                                findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment, arg)
                                             }
-                                        }
 
+                                        } else {
+                                            showSnackBar(
+                                                fragmentPostWriteBinding.root,
+                                                "저장됐습니다."
+                                            )
+
+//                                            postViewModel.setPost(post)
+                                            val arg = Bundle()
+                                            arg.putLong("postIdx", postIdx)
+                                            findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment, arg)
+                                        }
                                     }
                                 }
                             }
@@ -248,6 +247,14 @@ class PostWriteFragment : Fragment() {
         }
         // Inflate the layout for this fragment
         return fragmentPostWriteBinding.root
+    }
+
+    private fun showSnackBar(view: View, s: String) {
+        Snackbar.make(
+            view,
+            s,
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     //카메라 관련 설정

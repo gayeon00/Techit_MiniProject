@@ -1,4 +1,4 @@
-package com.test.mini02_boardproject01
+package com.test.mini02_boardproject01.data.model
 
 data class Post(
     var postIdx: Long = 0L,         //게시글 인덱스 번호
