@@ -8,11 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.test.mini02_boardproject01.ui.MainActivity
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.data.model.User
 import com.test.mini02_boardproject01.databinding.ActivityBoardMainBinding
 import com.test.mini02_boardproject01.databinding.NavHeaderBinding
+import com.test.mini02_boardproject01.ui.MainActivity
 
 class BoardMainActivity : AppCompatActivity() {
     lateinit var activityBoardMainBinding: ActivityBoardMainBinding
@@ -23,8 +23,8 @@ class BoardMainActivity : AppCompatActivity() {
     lateinit var loginUser: User
 
     // 게시판 종류
-    val boardTypeList = arrayOf(
-        "자유게시판", "유머게시판", "질문게시판", "스포츠게시판"
+    val postTypeList = arrayOf(
+        "자유게시판", "유머게시판", "스포츠게시판", "질문게시판"
     )
 
     // 확인할 권한 목록
@@ -81,14 +81,60 @@ class BoardMainActivity : AppCompatActivity() {
 
                 setNavigationItemSelectedListener {
                     when (it.itemId) {
-                        R.id.whole_item, R.id.free_item, R.id.humor_item, R.id.sports_item, R.id.qna_item-> {
+                        R.id.whole_item -> {
+                            materialToolbar.title = "전체게시판"
                             navController.popBackStack()
                             val args = Bundle()
-                            args.putString("boardType", it.itemId.toString())
+                            args.putLong("postType", 0L)
 
                             navController.navigate(R.id.postListFragment, args)
 
                             drawerLayout.close()
+                        }
+
+                        R.id.free_item -> {
+                            materialToolbar.title = "자유게시판"
+                            navController.popBackStack()
+                            val args = Bundle()
+                            args.putLong("postType", 1L)
+
+                            navController.navigate(R.id.postListFragment, args)
+
+                            drawerLayout.close()
+                        }
+
+                        R.id.humor_item -> {
+                            materialToolbar.title = "유머게시판"
+                            navController.popBackStack()
+                            val args = Bundle()
+                            args.putLong("postType", 2L)
+
+                            navController.navigate(R.id.postListFragment, args)
+
+                            drawerLayout.close()
+                        }
+
+                        R.id.sports_item -> {
+                            materialToolbar.title = "스포츠게시판"
+                            navController.popBackStack()
+                            val args = Bundle()
+                            args.putLong("postType",3L)
+
+                            navController.navigate(R.id.postListFragment, args)
+
+                            drawerLayout.close()
+                        }
+
+                        R.id.qna_item -> {
+                            materialToolbar.title = "질문게시판"
+                            navController.popBackStack()
+                            val args = Bundle()
+                            args.putLong("postType", 4L)
+
+                            navController.navigate(R.id.postListFragment, args)
+
+                            drawerLayout.close()
+
                         }
                         //사용자 정보 수정
                         R.id.item_user_info -> {

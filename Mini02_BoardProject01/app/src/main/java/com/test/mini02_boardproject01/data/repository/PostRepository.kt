@@ -5,6 +5,9 @@ import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.database
@@ -37,7 +40,7 @@ class PostRepository {
                         val postWriterIdx = postSnapShot.child("postWriterIdx").value as Long
 
                         post = Post(
-                            postType,
+                            idx,
                             postType,
                             postTitle,
                             postContent,
@@ -99,10 +102,28 @@ class PostRepository {
         }
 
         //image/currenttimemillies.jpg 이름으로 firebase storage에서 받아와서 image.value에 넣어줘야 함
-        fun getImage(fileName: String, callback1: (Task<ByteArray>) -> Unit) {
+        fun getImage(fileName: String, callback1: (Task<Uri>) -> Unit) {
             val storage = Firebase.storage
-            val imageRef = storage.reference.child(fileName)
-            imageRef.getBytes(Long.MAX_VALUE).addOnCompleteListener(callback1)
+            val fileRef = storage.reference.child(fileName)
+
+            // 데이터를 가져올 수 있는 경로를 가져온다.
+            fileRef.downloadUrl.addOnCompleteListener(callback1)
+
+        }
+
+        // 게시글 정보 전체를 가져온다.
+        fun getPostAll(callback1: (Task<DataSnapshot>) -> Unit){
+            val database = Firebase.database
+            val postDataRef = database.getReference("posts")
+            postDataRef.orderByChild("postIdx").get().addOnCompleteListener(callback1)
+        }
+
+        //특정 게시판의 글 정보만 가져온다.
+        fun getPostByPostType(postType: Long, callback1: (Task<DataSnapshot>) -> Unit) {
+            val database = Firebase.database
+            val postDataRef = database.getReference("posts")
+            postDataRef.orderByChild("postType").equalTo(postType.toDouble())
+                .orderByChild("postIdx").get().addOnCompleteListener(callback1)
         }
 
     }

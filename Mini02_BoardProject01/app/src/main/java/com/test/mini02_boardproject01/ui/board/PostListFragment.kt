@@ -1,6 +1,7 @@
 package com.test.mini02_boardproject01.ui.board
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,8 @@ class PostListFragment : Fragment() {
     lateinit var fragmentPostListBinding: FragmentPostListBinding
     lateinit var boardMainActivity: BoardMainActivity
     lateinit var postViewModel: PostViewModel
+
+    var postType = 0L
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,8 +37,9 @@ class PostListFragment : Fragment() {
         val actionBar = (activity as AppCompatActivity).supportActionBar
         actionBar?.show()
 
-        //TODO : recyclerView의 리스트 ViewModel로 연결해주기
+        postType = arguments?.getLong("postType")!!
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
+        postViewModel.getPostAll(postType)
 
         fragmentPostListBinding.run {
             recyclerViewAll.run {
@@ -67,6 +71,12 @@ class PostListFragment : Fragment() {
                 findNavController().navigate(R.id.action_postListFragment_to_postWriteFragment)
                 true
             }
+
+            postViewModel.run {
+                postList.observe(requireActivity()) {
+                    recyclerViewAll.adapter?.notifyDataSetChanged()
+                }
+            }
         }
         return fragmentPostListBinding.root
     }
@@ -74,7 +84,11 @@ class PostListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val boardType = arguments?.getString("boardType")
+        postViewModel.getPostAll(postType)
+
+        postViewModel.postList.observe(requireActivity()) {
+            fragmentPostListBinding.recyclerViewAll.adapter?.notifyDataSetChanged()
+        }
     }
 
     inner class AllRecyclerViewAdapter : Adapter<AllRecyclerViewAdapter.AllViewHolder>() {
@@ -86,7 +100,11 @@ class PostListFragment : Fragment() {
             init {
                 rowPostListBinding.root.setOnClickListener {
                     //글을 볼 수 있는 postreadfragment로 이동
-                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment)
+                    //항목 번째 객체에서 글 번호를 가져온다.
+                    val readPostIdx = postViewModel.postList.value!![adapterPosition].postIdx
+                    val arg = Bundle()
+                    arg.putLong("readPostIdx", readPostIdx)
+                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment, arg)
                 }
             }
         }
@@ -101,17 +119,19 @@ class PostListFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            return 100
+            Log.d("postlistsize", postViewModel.postList.value?.size!!.toString())
+            return postViewModel.postList.value?.size!!
         }
 
         override fun onBindViewHolder(holder: AllViewHolder, position: Int) {
-            holder.rowPostListSubject.text = "제목입니다: $position"
-            holder.rowPostListNickName.text = "작성자 : $position"
+            holder.rowPostListSubject.text = postViewModel.postList.value!![position].postTitle
+//            holder.rowPostListNickName.text = postViewModel.writerNicknameList.value!![position]
+//            holder.rowPostListNickName.text = "df"
         }
     }
 
-    inner class ResultRecyclerViewAdapter : Adapter<ResultRecyclerViewAdapter.AllViewHolder>() {
-        inner class AllViewHolder(rowPostListBinding: RowPostListBinding) :
+    inner class ResultRecyclerViewAdapter : Adapter<ResultRecyclerViewAdapter.ResultViewHolder>() {
+        inner class ResultViewHolder(rowPostListBinding: RowPostListBinding) :
             ViewHolder(rowPostListBinding.root) {
             val rowPostListSubject = rowPostListBinding.rowPostListSubject
             val rowPostListNickName = rowPostListBinding.rowPostListNickName
@@ -124,22 +144,22 @@ class PostListFragment : Fragment() {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
             val rowPostListBinding = RowPostListBinding.inflate(layoutInflater)
             rowPostListBinding.root.layoutParams = ViewGroup.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT
             )
-            return AllViewHolder(rowPostListBinding)
+            return ResultViewHolder(rowPostListBinding)
         }
 
         override fun getItemCount(): Int {
-            return 100
+            return postViewModel.postList.value?.size!!
         }
 
-        override fun onBindViewHolder(holder: AllViewHolder, position: Int) {
-            holder.rowPostListSubject.text = "제목입니다: $position"
-            holder.rowPostListNickName.text = "작성자 : $position"
+        override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
+            holder.rowPostListSubject.text = postViewModel.postList.value!![position].postTitle
+//            holder.rowPostListNickName.text = postViewModel.writerNicknameList.value!![position]
         }
     }
 }

@@ -1,16 +1,16 @@
 package com.test.mini02_boardproject01.domain
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.widget.ImageView
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.bumptech.glide.Glide
 import com.test.mini02_boardproject01.data.model.Post
 import com.test.mini02_boardproject01.data.repository.PostRepository
 import com.test.mini02_boardproject01.data.repository.UserRepository
-import java.io.ByteArrayInputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
 
 class PostViewModel : ViewModel() {
     var title = MutableLiveData<String>()
@@ -19,14 +19,25 @@ class PostViewModel : ViewModel() {
     var writer = MutableLiveData<String>()
     var date = MutableLiveData<String>()
 
+    // 이미지 파일 이름
+    var fileName = MutableLiveData<String>()
+
+    //게시글 작성자 닉네임
+    val writerNicknameList = MutableLiveData<MutableList<String>>()
+
+    // 게시글 목록
+    var postList = MutableLiveData<MutableList<Post>>()
+
+    init {
+        postList.value = mutableListOf()
+        writerNicknameList.value = mutableListOf()
+    }
+
     fun setPost(post: Post) {
         title.value = post.postTitle
         content.value = post.postContent
     }
 
-    fun setImage(bitmap: Bitmap) {
-        image.value = bitmap
-    }
 
     //게시글 읽기 화면
     fun setPostReadData(postIdx: Long) {
@@ -46,37 +57,45 @@ class PostViewModel : ViewModel() {
                     //사용자 받아오기
                     setWriter(postWriterIdx)
                     date.value = postDate
-                    setPostImage(postImage)
+                    // 이미지 파일 이름
+                    fileName.value = postImage
 
-                    val post = Post(
-                        postType,
-                        postType,
-                        postTitle,
-                        postContent,
-                        postDate,
-                        postImage,
-                        postWriterIdx
-                    )
+                    // 이미지가 있다면
+                    if (fileName.value != "None") {
+                        setPostImage()
+                    }
+//                    val post = Post(
+//                        postType,
+//                        postType,
+//                        postTitle,
+//                        postContent,
+//                        postDate,
+//                        postImage,
+//                        postWriterIdx
+//                    )
                 }
             }
         }
     }
 
-    private fun setPostImage(postImage: String) {
-        //image/currenttimemillies.jpg 이름으로 firebase storage에서 받아와서 image.value에 넣어줘야 함
-        PostRepository.getImage(postImage){
-            image.value = byteArrayToBitmap(it.result)
+    private fun setPostImage() {
+        PostRepository.getImage(fileName.value!!) {
+            thread {
+                // 파일에 접근할 수 있는 경로를 이용해 URL 객체를 생성한다.
+                val url = URL(it.result.toString())
+                // 접속한다.
+                val httpURLConnection = url.openConnection() as HttpURLConnection
+                // 이미지 객체를 생성한다.
+                val bitmap = BitmapFactory.decodeStream(httpURLConnection.inputStream)
+
+                //얜 왜 이렇게 하지? -> UI스레드에서 해주는거구나!
+                image.postValue(bitmap)
+            }
         }
-
-    }
-
-    private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
-        val inputStream = ByteArrayInputStream(byteArray)
-        return BitmapFactory.decodeStream(inputStream)
     }
 
     private fun setWriter(postWriterIdx: Long) {
-        UserRepository.getUserInfoByUserId(postWriterIdx.toString()) {
+        UserRepository.getUserInfoByUserIdx(postWriterIdx) {
             //가져온 데이터가 있다면
             if (it.result.exists()) {
                 for (c1 in it.result.children) {
@@ -85,4 +104,56 @@ class PostViewModel : ViewModel() {
             }
         }
     }
+
+    //게시글 목록
+    fun getPostAll(myPostType: Long) {
+        val tempList = mutableListOf<Post>()
+
+        PostRepository.getPostAll { task ->
+            for (postSnapShot in task.result.children) {
+                val postIdx = postSnapShot.child("postIdx").value as Long
+                val postType = postSnapShot.child("postType").value as Long
+                val postTitle = postSnapShot.child("postTitle").value as String
+                val postContent = postSnapShot.child("postContent").value as String
+                val postDate = postSnapShot.child("postDate").value as String
+                val postImage = postSnapShot.child("postImage").value as String
+                val postWriterIdx = postSnapShot.child("postWriterIdx").value as Long
+
+                if (myPostType != 0L && myPostType != postType) {
+                    continue
+                }
+
+                val post = Post(
+                    postIdx,
+                    postType,
+                    postTitle,
+                    postContent,
+                    postDate,
+                    postImage,
+                    postWriterIdx
+                )
+                tempList.add(post)
+
+
+                UserRepository.getUserInfoByUserIdx(postWriterIdx) {
+                    for (c2 in it.result.children) {
+                        val postWriterNickName = c2.child("userNickname").value as String
+                        writerNicknameList.value?.add(postWriterNickName)
+                    }
+
+                }
+
+            }
+
+            //데이터가 postIdx를 기준으로 오름차순 정렬 돼있어서 순서를 뒤집는다.
+            tempList.reverse()
+            Log.d("postlistsize", tempList.toString())
+            postList.value = tempList
+        }
+    }
+
+
 }
+
+
+

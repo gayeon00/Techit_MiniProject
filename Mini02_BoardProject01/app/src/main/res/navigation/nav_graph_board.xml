@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/postListFragment"
         android:name="com.test.mini02_boardproject01.ui.board.PostListFragment"
-        android:label="fragment_post_list"
+        android:label="전체게시판"
         tools:layout="@layout/fragment_post_list" >
         <action
             android:id="@+id/action_postListFragment_to_postWriteFragment"
@@ -41,8 +41,8 @@
             app:popEnterAnim="@anim/pop_enter_anim"
             app:popExitAnim="@anim/pop_exit_anim" />
         <argument
-            android:name="boardType"
-            app:argType="string" />
+            android:name="postType"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/postWriteFragment"
@@ -81,5 +81,9 @@
             app:exitAnim="@anim/pop_exit_anim"
             app:popEnterAnim="@anim/enter_anim"
             app:popExitAnim="@anim/exit_anim" />
+
+        <argument
+            android:name="readPostIdx"
+            app:argType="long"/>
     </fragment>
 </navigation>

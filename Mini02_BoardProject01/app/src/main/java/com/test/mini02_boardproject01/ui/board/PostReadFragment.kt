@@ -74,6 +74,7 @@ class PostReadFragment : Fragment() {
                     textInputEditTextPostReadContent.setText(it)
                 }
                 image.observe(requireActivity()) {
+                    imageViewPostRead.visibility = View.VISIBLE
                     imageViewPostRead.setImageBitmap(it)
                 }
                 date.observe(requireActivity()) {
@@ -81,6 +82,11 @@ class PostReadFragment : Fragment() {
                 }
                 writer.observe(requireActivity()) {
                     textInputEditTextPostReadWriter.setText(it)
+                }
+                fileName.observe(requireActivity()) {
+                    if (it == "None") {
+                        imageViewPostRead.visibility = View.GONE
+                    }
                 }
             }
 

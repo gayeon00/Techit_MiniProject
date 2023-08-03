@@ -41,7 +41,7 @@ class PostWriteFragment : Fragment() {
     lateinit var postViewModel: PostViewModel
 
     // 게시판 종류
-    var boardType = 0
+    var postType = 0
 
     //PostWriteFragment인지, PostModifyFragment인지
     var isModify = false
@@ -158,7 +158,7 @@ class PostWriteFragment : Fragment() {
                                 builder.show()
                                 return@setOnMenuItemClickListener true
                             }
-                            if (boardType == 0) {
+                            if (postType == 0) {
                                 val builder = MaterialAlertDialogBuilder(boardMainActivity)
                                 builder.setTitle("게시판 종류 선택 오류")
                                 builder.setMessage("게시판 종류를 선택해주세요")
@@ -184,7 +184,7 @@ class PostWriteFragment : Fragment() {
 
                                 val post = Post(
                                     postIdx,
-                                    boardType.toLong(),
+                                    postType.toLong(),
                                     subject,
                                     text,
                                     writeDate,
@@ -233,9 +233,9 @@ class PostWriteFragment : Fragment() {
             button.setOnClickListener {
                 val builder = MaterialAlertDialogBuilder(boardMainActivity)
                 builder.setTitle("게시판 종류")
-                builder.setItems(boardMainActivity.boardTypeList) { dialogInterface: DialogInterface, i: Int ->
-                    boardType = i + 1
-                    button.text = boardMainActivity.boardTypeList[i]
+                builder.setItems(boardMainActivity.postTypeList) { dialogInterface: DialogInterface, i: Int ->
+                    postType = i + 1
+                    button.text = boardMainActivity.postTypeList[i]
                 }
                 builder.setNegativeButton("취소", null)
                 builder.show()
@@ -282,8 +282,6 @@ class PostWriteFragment : Fragment() {
                 val bitmap3 =
                     Bitmap.createBitmap(bitmap2, 0, 0, bitmap2.width, bitmap2.height, matrix, false)
                 previewImageView.setImageBitmap(bitmap3)
-
-                postViewModel.setImage(bitmap3)
             }
         }
 
@@ -336,7 +334,6 @@ class PostWriteFragment : Fragment() {
                         val bitmap = ImageDecoder.decodeBitmap(source)
 
                         previewImageView.setImageBitmap(bitmap)
-                        postViewModel.setImage(bitmap)
                     } else {
                         // 컨텐츠 프로바이더를 통해 이미지 데이터 정보를 가져온다.
                         val cursor = boardMainActivity.contentResolver.query(
@@ -352,7 +349,6 @@ class PostWriteFragment : Fragment() {
                             // 이미지를 생성하여 보여준다.
                             val bitmap = BitmapFactory.decodeFile(source)
                             previewImageView.setImageBitmap(bitmap)
-                            postViewModel.setImage(bitmap)
                         }
                     }
                 }
