@@ -101,9 +101,10 @@ class PostListFragment : Fragment() {
                 rowPostListBinding.root.setOnClickListener {
                     //글을 볼 수 있는 postreadfragment로 이동
                     //항목 번째 객체에서 글 번호를 가져온다.
-                    val readPostIdx = postViewModel.postList.value!![adapterPosition].postIdx
+                    val postIdx = postViewModel.postList.value!![adapterPosition].postIdx
+                    Log.d("postIdx", postIdx.toString())
                     val arg = Bundle()
-                    arg.putLong("readPostIdx", readPostIdx)
+                    arg.putLong("postIdx", postIdx)
                     findNavController().navigate(R.id.action_postListFragment_to_postReadFragment, arg)
                 }
             }
@@ -119,7 +120,6 @@ class PostListFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            Log.d("postlistsize", postViewModel.postList.value?.size!!.toString())
             return postViewModel.postList.value?.size!!
         }
 

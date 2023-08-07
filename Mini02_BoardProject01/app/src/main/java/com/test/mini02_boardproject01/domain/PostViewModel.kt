@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.data.model.Post
 import com.test.mini02_boardproject01.data.repository.PostRepository
 import com.test.mini02_boardproject01.data.repository.UserRepository
@@ -18,6 +19,7 @@ class PostViewModel : ViewModel() {
     var image = MutableLiveData<Bitmap>()
     var writer = MutableLiveData<String>()
     var date = MutableLiveData<String>()
+    var type = MutableLiveData<Long>()
 
     // 이미지 파일 이름
     var fileName = MutableLiveData<String>()
@@ -52,6 +54,7 @@ class PostViewModel : ViewModel() {
                     val postImage = postSnapShot.child("postImage").value as String
                     val postWriterIdx = postSnapShot.child("postWriterIdx").value as Long
 
+                    type.value = postType
                     title.value = postTitle
                     content.value = postContent
                     //사용자 받아오기
@@ -60,10 +63,10 @@ class PostViewModel : ViewModel() {
                     // 이미지 파일 이름
                     fileName.value = postImage
 
+
                     // 이미지가 있다면
-                    if (fileName.value != "None") {
-                        setPostImage()
-                    }
+
+                    setPostImage()
 //                    val post = Post(
 //                        postType,
 //                        postType,
@@ -79,19 +82,24 @@ class PostViewModel : ViewModel() {
     }
 
     private fun setPostImage() {
-        PostRepository.getImage(fileName.value!!) {
-            thread {
-                // 파일에 접근할 수 있는 경로를 이용해 URL 객체를 생성한다.
-                val url = URL(it.result.toString())
-                // 접속한다.
-                val httpURLConnection = url.openConnection() as HttpURLConnection
-                // 이미지 객체를 생성한다.
-                val bitmap = BitmapFactory.decodeStream(httpURLConnection.inputStream)
+        if (fileName.value != "None") {
+            PostRepository.getImage(fileName.value!!) {
+                thread {
+                    // 파일에 접근할 수 있는 경로를 이용해 URL 객체를 생성한다.
+                    val url = URL(it.result.toString())
+                    // 접속한다.
+                    val httpURLConnection = url.openConnection() as HttpURLConnection
+                    // 이미지 객체를 생성한다.
+                    val bitmap = BitmapFactory.decodeStream(httpURLConnection.inputStream)
 
-                //얜 왜 이렇게 하지? -> UI스레드에서 해주는거구나!
-                image.postValue(bitmap)
+                    //얜 왜 이렇게 하지? -> UI스레드에서 해주는거구나!
+                    image.postValue(bitmap)
+                }
             }
+        } else {
+            image.postValue(Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888))
         }
+
     }
 
     private fun setWriter(postWriterIdx: Long) {
@@ -147,7 +155,6 @@ class PostViewModel : ViewModel() {
 
             //데이터가 postIdx를 기준으로 오름차순 정렬 돼있어서 순서를 뒤집는다.
             tempList.reverse()
-            Log.d("postlistsize", tempList.toString())
             postList.value = tempList
         }
     }

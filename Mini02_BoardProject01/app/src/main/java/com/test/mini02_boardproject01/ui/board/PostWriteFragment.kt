@@ -35,6 +35,7 @@ import java.util.Date
 import java.util.Locale
 
 class PostWriteFragment : Fragment() {
+
     lateinit var fragmentPostWriteBinding: FragmentPostWriteBinding
     lateinit var boardMainActivity: BoardMainActivity
 
@@ -45,6 +46,9 @@ class PostWriteFragment : Fragment() {
 
     //PostWriteFragment인지, PostModifyFragment인지
     var isModify = false
+    //Modify에 진입해서 사진을 새로 고르는건지
+    var isSelectNewImage = false
+    var postIdx = 0L
 
     // 업로드할 이미지의 Uri
     var uploadUri: Uri? = null
@@ -70,6 +74,7 @@ class PostWriteFragment : Fragment() {
 
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
         isModify = arguments?.getBoolean("isModify", false)!!
+        postIdx = arguments?.getLong("postIdx")!!
 
         fragmentPostWriteBinding.run {
 
@@ -77,14 +82,17 @@ class PostWriteFragment : Fragment() {
                 //감시자 달아줌
                 //modify일 경우 감시자 작동함
                 postViewModel.run {
-                    title.observe(requireActivity()) {
+                    title.observe(viewLifecycleOwner) {
                         textInputEditTextPostWriteSubject.setText(it)
                     }
-                    content.observe(requireActivity()) {
+                    content.observe(viewLifecycleOwner) {
                         textInputEditTextPostWriteText.setText(it)
                     }
-                    image.observe(requireActivity()) {
+                    image.observe(viewLifecycleOwner) {
                         imageView.setImageBitmap(it)
+                    }
+                    type.observe(viewLifecycleOwner) {
+                        button.text = boardMainActivity.postTypeList[it.toInt() - 1]
                     }
                 }
 
@@ -136,45 +144,76 @@ class PostWriteFragment : Fragment() {
                         }
 
                         R.id.item_complete -> {
-                            //제목 내용 유효성 검사
                             // 입력한 내용을 가져온다.
                             val subject = textInputEditTextPostWriteSubject.text.toString()
                             val text = textInputEditTextPostWriteText.text.toString()
 
-                            if (subject.isEmpty()) {
-                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                                builder.setTitle("제목 입력 오류")
-                                builder.setMessage("제목을 입력해주세요")
-                                builder.setPositiveButton("확인", null)
-                                builder.show()
-                                return@setOnMenuItemClickListener true
-                            }
+                            //게시글 저장
+                            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val writeDate = sdf.format(Date(System.currentTimeMillis()))
 
-                            if (text.isEmpty()) {
-                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                                builder.setTitle("내용 입력 오류")
-                                builder.setMessage("내용을 입력해주세요")
-                                builder.setPositiveButton("확인", null)
-                                builder.show()
-                                return@setOnMenuItemClickListener true
-                            }
-                            if (postType == 0) {
-                                val builder = MaterialAlertDialogBuilder(boardMainActivity)
-                                builder.setTitle("게시판 종류 선택 오류")
-                                builder.setMessage("게시판 종류를 선택해주세요")
-                                builder.setPositiveButton("확인", null)
-                                builder.show()
-                                return@setOnMenuItemClickListener true
-                            }
+                            if (isModify) {
 
-                            PostRepository.getPostIdx { task ->
-                                var postIdx = task.result.value as Long
-                                //게시글 인덱스 증가
-                                postIdx++
+                                val fileName = if (!isSelectNewImage) {
+                                    //새로 고른게 아니라면 원래 쓰던 filename으로
+                                    postViewModel.fileName.value
+                                } else {
+                                    //새로 골랐는데, 원래 없었다면
+                                    if (postViewModel.fileName.value == "None") {
+                                        "image/img_${System.currentTimeMillis()}.jpg"
+                                    } else {
+                                        //새로 골랐는데, 원래 있었다면
+                                        postViewModel.fileName.value
+                                    }
+                                }
 
-                                //게시글 저장
-                                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                                val writeDate = sdf.format(Date(System.currentTimeMillis()))
+                                //원래 있던 자리에 덮어씌우기
+                                val post = Post(
+                                    postIdx,
+                                    postType.toLong(),
+                                    subject,
+                                    text,
+                                    writeDate,
+                                    fileName!!,
+                                    boardMainActivity.loginUser.userIdx
+                                )
+                                PostRepository.modifyPost(post, isSelectNewImage) {
+                                    //새로운 이미지 업로드
+                                    if (uploadUri != null) {
+
+                                        PostRepository.uploadImage(fileName, uploadUri) {
+                                            showSnackBar(
+                                                fragmentPostWriteBinding.root,
+                                                "저장됐습니다."
+                                            )
+
+//                                                postViewModel.setPost(post)
+                                            val arg = Bundle()
+                                            arg.putLong("postIdx", postIdx)
+                                            findNavController().navigate(
+                                                R.id.action_postWriteFragment_to_postReadFragment,
+                                                arg
+                                            )
+                                        }
+
+                                    } else {
+                                        showSnackBar(
+                                            fragmentPostWriteBinding.root,
+                                            "저장됐습니다."
+                                        )
+
+//                                            postViewModel.setPost(post)
+                                        val arg = Bundle()
+                                        arg.putLong("postIdx", postIdx)
+                                        findNavController().navigate(
+                                            R.id.action_postWriteFragment_to_postReadFragment,
+                                            arg
+                                        )
+                                    }
+                                }
+
+
+                            } else {
 
                                 val fileName = if (uploadUri == null) {
                                     "None"
@@ -182,47 +221,89 @@ class PostWriteFragment : Fragment() {
                                     "image/img_${System.currentTimeMillis()}.jpg"
                                 }
 
-                                val post = Post(
-                                    postIdx,
-                                    postType.toLong(),
-                                    subject,
-                                    text,
-                                    writeDate,
-                                    fileName,
-                                    boardMainActivity.loginUser.userIdx
-                                )
 
-                                PostRepository.addPostInfo(post) {
-                                    PostRepository.setPostIdx(postIdx) {
+                                //제목 내용 유효성 검사
+                                if (subject.isEmpty()) {
+                                    val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                    builder.setTitle("제목 입력 오류")
+                                    builder.setMessage("제목을 입력해주세요")
+                                    builder.setPositiveButton("확인", null)
+                                    builder.show()
+                                    return@setOnMenuItemClickListener true
+                                }
 
-                                        if (uploadUri != null) {
+                                if (text.isEmpty()) {
+                                    val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                    builder.setTitle("내용 입력 오류")
+                                    builder.setMessage("내용을 입력해주세요")
+                                    builder.setPositiveButton("확인", null)
+                                    builder.show()
+                                    return@setOnMenuItemClickListener true
+                                }
+                                if (postType == 0) {
+                                    val builder = MaterialAlertDialogBuilder(boardMainActivity)
+                                    builder.setTitle("게시판 종류 선택 오류")
+                                    builder.setMessage("게시판 종류를 선택해주세요")
+                                    builder.setPositiveButton("확인", null)
+                                    builder.show()
+                                    return@setOnMenuItemClickListener true
+                                }
 
-                                            PostRepository.uploadImage(fileName, uploadUri) {
+                                PostRepository.getPostIdx { task ->
+                                    var postIdx = task.result.value as Long
+                                    //게시글 인덱스 증가
+                                    postIdx++
+
+
+                                    val post = Post(
+                                        postIdx,
+                                        postType.toLong(),
+                                        subject,
+                                        text,
+                                        writeDate,
+                                        fileName!!,
+                                        boardMainActivity.loginUser.userIdx
+                                    )
+
+                                    PostRepository.addPostInfo(post) {
+                                        PostRepository.setPostIdx(postIdx) {
+
+                                            if (uploadUri != null) {
+
+                                                PostRepository.uploadImage(fileName, uploadUri) {
+                                                    showSnackBar(
+                                                        fragmentPostWriteBinding.root,
+                                                        "저장됐습니다."
+                                                    )
+
+//                                                postViewModel.setPost(post)
+                                                    val arg = Bundle()
+                                                    arg.putLong("postIdx", postIdx)
+                                                    findNavController().navigate(
+                                                        R.id.action_postWriteFragment_to_postReadFragment,
+                                                        arg
+                                                    )
+                                                }
+
+                                            } else {
                                                 showSnackBar(
                                                     fragmentPostWriteBinding.root,
                                                     "저장됐습니다."
                                                 )
 
-//                                                postViewModel.setPost(post)
+//                                            postViewModel.setPost(post)
                                                 val arg = Bundle()
                                                 arg.putLong("postIdx", postIdx)
-                                                findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment, arg)
+                                                findNavController().navigate(
+                                                    R.id.action_postWriteFragment_to_postReadFragment,
+                                                    arg
+                                                )
                                             }
-
-                                        } else {
-                                            showSnackBar(
-                                                fragmentPostWriteBinding.root,
-                                                "저장됐습니다."
-                                            )
-
-//                                            postViewModel.setPost(post)
-                                            val arg = Bundle()
-                                            arg.putLong("postIdx", postIdx)
-                                            findNavController().navigate(R.id.action_postWriteFragment_to_postReadFragment, arg)
                                         }
                                     }
                                 }
                             }
+
 
                         }
                     }
@@ -264,6 +345,9 @@ class PostWriteFragment : Fragment() {
         val cameraLauncher = registerForActivityResult(cameraContract) {
 
             if (it?.resultCode == AppCompatActivity.RESULT_OK) {
+                //새로운 이미지 선택 여부값 설정
+                if (isModify) isSelectNewImage = true
+
 
                 // Uri를 이용해 이미지에 접근하여 Bitmap 객체로 생성한다.
                 val bitmap = BitmapFactory.decodeFile(uploadUri?.path)
@@ -322,6 +406,9 @@ class PostWriteFragment : Fragment() {
             if (it.resultCode == AppCompatActivity.RESULT_OK) {
                 // 선택한 이미지에 접근할 수 있는 Uri 객체를 추출한다.
                 if (it.data?.data != null) {
+                    //새로운 이미지 선택 여부값 설정
+                    if (isModify) isSelectNewImage = true
+
                     uploadUri = it.data?.data
 
                     // 안드로이드 10 (Q) 이상이라면...

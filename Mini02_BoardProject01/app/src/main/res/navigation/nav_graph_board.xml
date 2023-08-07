@@ -83,7 +83,7 @@
             app:popExitAnim="@anim/exit_anim" />
 
         <argument
-            android:name="readPostIdx"
+            android:name="postIdx"
             app:argType="long"/>
     </fragment>
 </navigation>

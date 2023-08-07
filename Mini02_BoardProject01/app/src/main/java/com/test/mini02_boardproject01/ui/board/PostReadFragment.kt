@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.test.mini02_boardproject01.R
+import com.test.mini02_boardproject01.data.repository.PostRepository
 import com.test.mini02_boardproject01.databinding.FragmentPostReadBinding
 import com.test.mini02_boardproject01.domain.PostViewModel
 
@@ -37,8 +38,8 @@ class PostReadFragment : Fragment() {
         postViewModel = ViewModelProvider(requireActivity())[PostViewModel::class.java]
         //viewmodel의 title, content 업데이트
         //게시글 인덱스 번호를 받는다.
-        val readPostIdx = arguments?.getLong("postIdx")!!
-        postViewModel.setPostReadData(readPostIdx)
+        val postIdx = arguments?.getLong("postIdx")!!
+        postViewModel.setPostReadData(postIdx)
 
 
         fragmentPostReadBinding.run {
@@ -48,13 +49,25 @@ class PostReadFragment : Fragment() {
                         R.id.item_edit -> {
                             val arg = Bundle()
                             arg.putBoolean("isModify", true)
+                            arg.putLong("postIdx", postIdx)
                             findNavController().navigate(
                                 R.id.action_postReadFragment_to_postWriteFragment, arg
                             )
                         }
 
                         R.id.item_delete -> {
-                            findNavController().navigate(R.id.action_postReadFragment_to_postListFragment)
+                            //글 삭제
+                            PostRepository.removePost(postIdx) {
+                                //이미지가 있으면 삭제
+                                if (postViewModel.fileName.value != "None") {
+                                    PostRepository.removeImage(postViewModel.fileName.value!!) {
+                                        findNavController().navigate(R.id.action_postReadFragment_to_postListFragment)
+                                    }
+                                } else {
+                                    findNavController().navigate(R.id.action_postReadFragment_to_postListFragment)
+                                }
+                            }
+
                         }
                     }
                     true
