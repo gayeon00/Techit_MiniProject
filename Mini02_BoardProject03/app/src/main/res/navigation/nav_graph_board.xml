@@ -9,7 +9,14 @@
         android:id="@+id/postListFragment"
         android:name="com.test.mini02_boardproject03.board.PostListFragment"
         android:label="전체게시판"
-        tools:layout="@layout/fragment_post_list" />
+        tools:layout="@layout/fragment_post_list" >
+        <action
+            android:id="@+id/action_postListFragment_to_postReadFragment"
+            app:destination="@id/postReadFragment" />
+        <action
+            android:id="@+id/action_postListFragment_to_postWriteFragment"
+            app:destination="@id/postWriteFragment" />
+    </fragment>
     <fragment
         android:id="@+id/postFreeFragment"
         android:name="com.test.mini02_boardproject03.board.PostFreeFragment"
@@ -35,4 +42,14 @@
         android:name="com.test.mini02_boardproject03.board.ModifyUserFragment"
         android:label="사용자 정보 수정"
         tools:layout="@layout/fragment_modify_user" />
+    <fragment
+        android:id="@+id/postReadFragment"
+        android:name="com.test.mini02_boardproject03.PostReadFragment"
+        android:label="게시글 확인"
+        tools:layout="@layout/fragment_post_read" />
+    <fragment
+        android:id="@+id/postWriteFragment"
+        android:name="com.test.mini02_boardproject03.PostWriteFragment"
+        android:label="게시글 작성"
+        tools:layout="@layout/fragment_post_write" />
 </navigation>

@@ -1,60 +1,94 @@
 package com.test.mini02_boardproject03.board
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.test.mini02_boardproject03.R
+import com.test.mini02_boardproject03.databinding.FragmentPostListBinding
+import com.test.mini02_boardproject03.databinding.RowPostListBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PostListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PostListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+    lateinit var fragmentPostListBinding: FragmentPostListBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        fragmentPostListBinding = FragmentPostListBinding.inflate(layoutInflater)
+
+        fragmentPostListBinding.run {
+            recyclerViewAll.run {
+                adapter = RecyclerViewAdapter()
+                layoutManager = LinearLayoutManager(context)
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        context,
+                        MaterialDividerItemDecoration.VERTICAL
+                    )
+                )
+            }
+
+            recyclerViewSearchList.run {
+                adapter = RecyclerViewAdapter()
+                layoutManager = LinearLayoutManager(context)
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        context,
+                        MaterialDividerItemDecoration.VERTICAL
+                    )
+                )
+            }
+
+            searchBar.setOnMenuItemClickListener {
+                //메뉴 누르면 수행할 일
+//                val arg = Bundle()
+//                arg.putBoolean("isModify", false)
+                findNavController().navigate(R.id.action_postListFragment_to_postWriteFragment)
+                true
+            }
+        }
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_post_list, container, false)
+        return fragmentPostListBinding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PostListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PostListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    inner class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.AllViewHolder>() {
+        inner class AllViewHolder(rowPostListBinding: RowPostListBinding) :
+            RecyclerView.ViewHolder(rowPostListBinding.root) {
+            val rowPostListSubject = rowPostListBinding.rowPostListSubject
+            val rowPostListNickName = rowPostListBinding.rowPostListNickName
+
+            init {
+                rowPostListBinding.root.setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_postListFragment_to_postReadFragment
+                    )
                 }
             }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllViewHolder {
+            val rowPostListBinding = RowPostListBinding.inflate(layoutInflater)
+            rowPostListBinding.root.layoutParams = ViewGroup.LayoutParams(
+                RecyclerView.LayoutParams.MATCH_PARENT,
+                RecyclerView.LayoutParams.WRAP_CONTENT
+            )
+            return AllViewHolder(rowPostListBinding)
+        }
+
+        override fun getItemCount(): Int {
+            return 100
+        }
+
+        override fun onBindViewHolder(holder: AllViewHolder, position: Int) {
+            holder.rowPostListSubject.text = "데이터$position"
+            holder.rowPostListNickName.text = "사용자$position"
+        }
     }
+
 }
