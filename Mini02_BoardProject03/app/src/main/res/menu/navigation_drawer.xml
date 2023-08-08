@@ -45,15 +45,4 @@
         android:icon="@drawable/account_box_24px"
         android:title="사용자 정보 수정"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/item_logout"
-        android:icon="@drawable/logout_24px"
-        android:title="로그아웃"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/item_delete"
-        android:icon="@drawable/person_remove_24px"
-        android:title="회원탈퇴"
-        app:showAsAction="ifRoom"
-        tools:ignore="DuplicateIds" />
 </menu>
