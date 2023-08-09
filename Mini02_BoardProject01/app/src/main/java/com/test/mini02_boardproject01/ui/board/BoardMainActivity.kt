@@ -27,6 +27,8 @@ class BoardMainActivity : AppCompatActivity() {
         "자유게시판", "유머게시판", "스포츠게시판", "질문게시판"
     )
 
+    var nowPostType = 0
+
     // 확인할 권한 목록
     val permissionList = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -76,7 +78,7 @@ class BoardMainActivity : AppCompatActivity() {
 
                 // 헤더설정
                 val headerBoardMainBinding = NavHeaderBinding.inflate(layoutInflater)
-                headerBoardMainBinding.textViewHeaderTitle.text = "홍길동님"
+                headerBoardMainBinding.textViewHeaderTitle.text = "${loginUser.userNickname}님"
                 addHeaderView(headerBoardMainBinding.root)
 
                 setNavigationItemSelectedListener {
@@ -86,6 +88,7 @@ class BoardMainActivity : AppCompatActivity() {
                             navController.popBackStack()
                             val args = Bundle()
                             args.putLong("postType", 0L)
+                            nowPostType = 0
 
                             navController.navigate(R.id.postListFragment, args)
 
@@ -97,7 +100,7 @@ class BoardMainActivity : AppCompatActivity() {
                             navController.popBackStack()
                             val args = Bundle()
                             args.putLong("postType", 1L)
-
+                            nowPostType = 1
                             navController.navigate(R.id.postListFragment, args)
 
                             drawerLayout.close()
@@ -108,7 +111,7 @@ class BoardMainActivity : AppCompatActivity() {
                             navController.popBackStack()
                             val args = Bundle()
                             args.putLong("postType", 2L)
-
+                            nowPostType = 2
                             navController.navigate(R.id.postListFragment, args)
 
                             drawerLayout.close()
@@ -118,8 +121,8 @@ class BoardMainActivity : AppCompatActivity() {
                             materialToolbar.title = "스포츠게시판"
                             navController.popBackStack()
                             val args = Bundle()
-                            args.putLong("postType",3L)
-
+                            args.putLong("postType", 3L)
+                            nowPostType = 3
                             navController.navigate(R.id.postListFragment, args)
 
                             drawerLayout.close()
@@ -130,7 +133,7 @@ class BoardMainActivity : AppCompatActivity() {
                             navController.popBackStack()
                             val args = Bundle()
                             args.putLong("postType", 4L)
-
+                            nowPostType = 4
                             navController.navigate(R.id.postListFragment, args)
 
                             drawerLayout.close()

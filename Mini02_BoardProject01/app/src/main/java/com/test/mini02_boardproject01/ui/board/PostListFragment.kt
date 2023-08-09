@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.LayoutParams
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import com.google.android.material.search.SearchView
 import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.databinding.FragmentPostListBinding
 import com.test.mini02_boardproject01.databinding.RowPostListBinding
@@ -43,7 +44,7 @@ class PostListFragment : Fragment() {
 
         fragmentPostListBinding.run {
             recyclerViewAll.run {
-                adapter = AllRecyclerViewAdapter()
+                adapter = RecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
                 addItemDecoration(
                     MaterialDividerItemDecoration(
@@ -54,7 +55,7 @@ class PostListFragment : Fragment() {
             }
 
             recyclerViewSearchList.run {
-                adapter = ResultRecyclerViewAdapter()
+                adapter = RecyclerViewAdapter()
                 layoutManager = LinearLayoutManager(context)
                 addItemDecoration(
                     MaterialDividerItemDecoration(
@@ -72,9 +73,35 @@ class PostListFragment : Fragment() {
                 true
             }
 
+            searchView.run {
+                addTransitionListener { searchView, previousState, newState ->
+                    // 서치바를 눌러 서치뷰가 보일 때
+                    if (newState == SearchView.TransitionState.SHOWING) {
+                        // Snackbar.make(fragmentPostListBinding.root, "Showing", Snackbar.LENGTH_SHORT).show()
+                        postViewModel.resetPostList()
+                    }
+                    // 서치뷰의 백버튼을 눌러 서치뷰가 사라지고 서치바가 보일 때
+                    else if (newState == SearchView.TransitionState.HIDING) {
+                        // Snackbar.make(fragmentPostListBinding.root, "Hiding", Snackbar.LENGTH_SHORT).show()
+                        postViewModel.getPostAll(postType)
+                    }
+                }
+
+                editText.setOnEditorActionListener { textView, i, keyEvent ->
+//                    Snackbar.make(fragmentPostListBinding.root, text!!, Snackbar.LENGTH_SHORT).show()
+                    postViewModel.getSearchPostList(
+                        arguments?.getLong("postType")!!,
+                        text.toString()
+                    )
+
+                    true
+                }
+            }
+
             postViewModel.run {
                 postList.observe(requireActivity()) {
                     recyclerViewAll.adapter?.notifyDataSetChanged()
+                    recyclerViewSearchList.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -91,7 +118,7 @@ class PostListFragment : Fragment() {
         }
     }
 
-    inner class AllRecyclerViewAdapter : Adapter<AllRecyclerViewAdapter.AllViewHolder>() {
+    inner class RecyclerViewAdapter : Adapter<RecyclerViewAdapter.AllViewHolder>() {
         inner class AllViewHolder(rowPostListBinding: RowPostListBinding) :
             ViewHolder(rowPostListBinding.root) {
             val rowPostListSubject = rowPostListBinding.rowPostListSubject
@@ -105,7 +132,10 @@ class PostListFragment : Fragment() {
                     Log.d("postIdx", postIdx.toString())
                     val arg = Bundle()
                     arg.putLong("postIdx", postIdx)
-                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment, arg)
+                    findNavController().navigate(
+                        R.id.action_postListFragment_to_postReadFragment,
+                        arg
+                    )
                 }
             }
         }
@@ -127,39 +157,6 @@ class PostListFragment : Fragment() {
             holder.rowPostListSubject.text = postViewModel.postList.value!![position].postTitle
 //            holder.rowPostListNickName.text = postViewModel.writerNicknameList.value!![position]
 //            holder.rowPostListNickName.text = "df"
-        }
-    }
-
-    inner class ResultRecyclerViewAdapter : Adapter<ResultRecyclerViewAdapter.ResultViewHolder>() {
-        inner class ResultViewHolder(rowPostListBinding: RowPostListBinding) :
-            ViewHolder(rowPostListBinding.root) {
-            val rowPostListSubject = rowPostListBinding.rowPostListSubject
-            val rowPostListNickName = rowPostListBinding.rowPostListNickName
-
-            init {
-                rowPostListBinding.root.setOnClickListener {
-                    //글을 볼 수 있는 postreadfragment로 이동
-                    findNavController().navigate(R.id.action_postListFragment_to_postReadFragment)
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
-            val rowPostListBinding = RowPostListBinding.inflate(layoutInflater)
-            rowPostListBinding.root.layoutParams = ViewGroup.LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT
-            )
-            return ResultViewHolder(rowPostListBinding)
-        }
-
-        override fun getItemCount(): Int {
-            return postViewModel.postList.value?.size!!
-        }
-
-        override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
-            holder.rowPostListSubject.text = postViewModel.postList.value!![position].postTitle
-//            holder.rowPostListNickName.text = postViewModel.writerNicknameList.value!![position]
         }
     }
 }

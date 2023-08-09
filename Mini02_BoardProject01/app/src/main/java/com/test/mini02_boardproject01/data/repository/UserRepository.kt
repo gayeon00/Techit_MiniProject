@@ -44,13 +44,32 @@ class UserRepository {
             userDataRef.orderByChild("userId").equalTo(loginUserId).get()
                 .addOnCompleteListener(callback1)
         }
+
         //사용자 인덱스를 통해 사용자 정보 가져오기
         // 사용자 인덱스를 통해 사용자 정보를 가져온다.
-        fun getUserInfoByUserIdx(userIdx:Long, callback1: (Task<DataSnapshot>) -> Unit){
+        fun getUserInfoByUserIdx(userIdx: Long, callback1: (Task<DataSnapshot>) -> Unit) {
             val database = Firebase.database
             val userDataRef = database.getReference("users")
 
-            userDataRef.orderByChild("userIdx").equalTo(userIdx.toDouble()).get().addOnCompleteListener(callback1)
+            userDataRef.orderByChild("userIdx").equalTo(userIdx.toDouble()).get()
+                .addOnCompleteListener(callback1)
+        }
+
+        //사용자 정보를 수정하는 메서드
+        fun modifyUserInfo(user: User) {
+            getUserInfoByUserIdx(user.userIdx) {
+                for(a1 in it.result.children) {
+                    //비밀번호 수정
+                    a1.ref.child("userPw").setValue(user.userPw)
+                    a1.ref.child("userNickname").setValue(user.userNickname)
+                    a1.ref.child("userAge").setValue(user.userAge)
+                    a1.ref.child("userJoinRoute1").setValue(user.userJoinRoute1)
+                    a1.ref.child("userJoinRoute2").setValue(user.userJoinRoute2)
+                    a1.ref.child("userJoinRoute3").setValue(user.userJoinRoute3)
+                    a1.ref.child("userJoinRoute4").setValue(user.userJoinRoute4)
+                    a1.ref.child("userJoinRoute5").setValue(user.userJoinRoute5)
+                }
+            }
         }
     }
 }

@@ -2,10 +2,8 @@ package com.test.mini02_boardproject01.domain
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.test.mini02_boardproject01.R
 import com.test.mini02_boardproject01.data.model.Post
 import com.test.mini02_boardproject01.data.repository.PostRepository
 import com.test.mini02_boardproject01.data.repository.UserRepository
@@ -97,7 +95,7 @@ class PostViewModel : ViewModel() {
                 }
             }
         } else {
-            image.postValue(Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888))
+            image.postValue(Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888))
         }
 
     }
@@ -116,6 +114,7 @@ class PostViewModel : ViewModel() {
     //게시글 목록
     fun getPostAll(myPostType: Long) {
         val tempList = mutableListOf<Post>()
+        val tempList2 = mutableListOf<String>()
 
         PostRepository.getPostAll { task ->
             for (postSnapShot in task.result.children) {
@@ -146,7 +145,7 @@ class PostViewModel : ViewModel() {
                 UserRepository.getUserInfoByUserIdx(postWriterIdx) {
                     for (c2 in it.result.children) {
                         val postWriterNickName = c2.child("userNickname").value as String
-                        writerNicknameList.value?.add(postWriterNickName)
+                        tempList2.add(postWriterNickName)
                     }
 
                 }
@@ -155,8 +154,72 @@ class PostViewModel : ViewModel() {
 
             //데이터가 postIdx를 기준으로 오름차순 정렬 돼있어서 순서를 뒤집는다.
             tempList.reverse()
+            tempList2.reverse()
             postList.value = tempList
+            writerNicknameList.value = tempList2
         }
+    }
+
+    //postList 초기화
+    fun resetPostList() {
+        postList.value = mutableListOf<Post>()
+        writerNicknameList.value = mutableListOf<String>()
+    }
+
+    //검색결과를 가져옴
+    fun getSearchPostList(myPostType: Long, keyword: String) {
+
+        val tempList = mutableListOf<Post>()
+        val tempList2 = mutableListOf<String>()
+
+        PostRepository.getPostAll { task ->
+            for (postSnapShot in task.result.children) {
+                val postIdx = postSnapShot.child("postIdx").value as Long
+                val postType = postSnapShot.child("postType").value as Long
+                val postTitle = postSnapShot.child("postTitle").value as String
+                val postContent = postSnapShot.child("postContent").value as String
+                val postDate = postSnapShot.child("postDate").value as String
+                val postImage = postSnapShot.child("postImage").value as String
+                val postWriterIdx = postSnapShot.child("postWriterIdx").value as Long
+
+                if (myPostType != 0L && myPostType != postType) {
+                    continue
+                }
+
+                //제목에도 없고 내용에도 없다면 넘어가기
+                if (!postTitle.contains(keyword) && !postContent.contains(keyword)) {
+                    continue
+                }
+
+                val post = Post(
+                    postIdx,
+                    postType,
+                    postTitle,
+                    postContent,
+                    postDate,
+                    postImage,
+                    postWriterIdx
+                )
+                tempList.add(post)
+
+
+                UserRepository.getUserInfoByUserIdx(postWriterIdx) {
+                    for (c2 in it.result.children) {
+                        val postWriterNickName = c2.child("userNickname").value as String
+                        tempList2.add(postWriterNickName)
+                    }
+
+                }
+
+            }
+
+            //데이터가 postIdx를 기준으로 오름차순 정렬 돼있어서 순서를 뒤집는다.
+            tempList.reverse()
+            tempList2.reverse()
+            postList.value = tempList
+            writerNicknameList.value = tempList2
+        }
+
     }
 
 

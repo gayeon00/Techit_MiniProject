@@ -10,7 +10,11 @@
         android:id="@+id/item_board_main_user_info"
         android:name="com.test.mini02_boardproject01.ui.board.ModifyUserFragment"
         android:label="fragment_modify_user"
-        tools:layout="@layout/fragment_modify_user" />
+        tools:layout="@layout/fragment_modify_user" >
+        <action
+            android:id="@+id/action_item_board_main_user_info_to_postListFragment"
+            app:destination="@id/postListFragment" />
+    </fragment>
     <activity
         android:id="@+id/item_board_main_logout"
         android:name="com.test.mini02_boardproject01.ui.MainActivity"
